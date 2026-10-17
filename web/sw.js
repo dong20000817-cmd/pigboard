@@ -1,27 +1,41 @@
 // 由 build.py 自动生成，请勿手改
 
-/* 生猪看板 Service Worker —— 让已「添加到主屏幕」的 iPhone 在 Mac 关机/断网时
-   仍能打开最后一次成功同步的看板。
-   策略：导航请求 network-first（在线永远拿最新），失败回落缓存；
-        静态资源 stale-while-revalidate。 */
+/* 生猪看板 Service Worker
+   目标：已「添加到主屏幕」的 iPhone 在 Mac 关机 / 断网时，仍能打开最后一次同步的看板。
+   策略：导航 network-first（在线永远拿最新），失败回落缓存；静态资源 stale-while-revalidate。
+
+   ⚠ 全部使用**相对路径**：本站点可能部署在子路径下（如 GitHub Pages 的 /pigboard/），
+     若写成 '/xxx' 会解析到域名根，导致预缓存全部 404。 */
 const VERSION = 'v-20261017-9f3ca1';
-const CORE = ['/', '/manifest.webmanifest', '/icons/apple-touch-icon.png',
-              '/icons/icon-192.png', '/icons/icon-512.png'];
+const CORE = [
+  './',
+  './manifest.webmanifest',
+  './icons/apple-touch-icon.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
 
 self.addEventListener('install', function (e) {
   self.skipWaiting();
-  e.waitUntil(caches.open(VERSION).then(function (c) {
-    return Promise.all(CORE.map(function (u) {
-      return c.add(new Request(u, { cache: 'reload' })).catch(function () {});
-    }));
-  }));
+  e.waitUntil((async function () {
+    const c = await caches.open(VERSION);
+    for (const u of CORE) {
+      try {
+        await c.add(new Request(u, { cache: 'reload' }));
+      } catch (_) {
+        try { await c.add(u); } catch (__) {}
+      }
+    }
+  })());
 });
 
 self.addEventListener('activate', function (e) {
-  e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.filter(function (k) { return k !== VERSION; })
+  e.waitUntil((async function () {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(function (k) { return k !== VERSION; })
                           .map(function (k) { return caches.delete(k); }));
-  }).then(function () { return self.clients.claim(); }));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', function (e) {
@@ -32,29 +46,52 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== location.origin) return;
 
   if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req).then(function (r) {
-        const cp = r.clone();
-        caches.open(VERSION).then(function (c) { c.put('/', cp); });
+    e.respondWith((async function () {
+      try {
+        const r = await fetch(req);
+        if (r && r.ok) {
+          const c = await caches.open(VERSION);
+          // 同时按"本次请求 URL"和"应用根"保存，兼容子路径与根路径部署
+          try { await c.put(req, r.clone()); } catch (_) {}
+          try { await c.put(new URL('./', self.registration.scope).href, r.clone()); } catch (_) {}
+        }
         return r;
-      }).catch(function () {
-        return caches.match('/').then(function (r) {
-          return r || new Response('<h1>离线</h1><p>尚无缓存，请先连接一次。</p>',
-            { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
-        });
-      })
-    );
+      } catch (_) {
+        const hit = (await caches.match(req)) ||
+                    (await caches.match(new URL('./', self.registration.scope).href));
+        return hit || new Response(
+          '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
+          '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
+          '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
+          { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+      }
+    })());
     return;
   }
 
-  e.respondWith(caches.match(req).then(function (hit) {
-    const net = fetch(req).then(function (r) {
-      if (r && r.ok) {
-        const cp = r.clone();
-        caches.open(VERSION).then(function (c) { c.put(req, cp); });
+  e.respondWith((async function () {
+    // 带查询串的请求（如心跳 ?_=时间戳）不写入缓存，否则每次访问都会新增一条，无限膨胀
+    const cacheable = !url.search;
+    const hit = await caches.match(req, { ignoreSearch: true });
+    if (hit) {
+      // 后台更新，不阻塞返回
+      fetch(req).then(async function (r) {
+        if (r && r.ok && cacheable) {
+          const c = await caches.open(VERSION);
+          c.put(req, r.clone()).catch(function () {});
+        }
+      }).catch(function () {});
+      return hit;
+    }
+    try {
+      const r = await fetch(req);
+      if (r && r.ok && cacheable) {
+        const c = await caches.open(VERSION);
+        c.put(req, r.clone()).catch(function () {});
       }
       return r;
-    }).catch(function () { return hit; });
-    return hit || net;
-  }));
+    } catch (_) {
+      return new Response('', { status: 504 });
+    }
+  })());
 });
