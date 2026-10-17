@@ -1253,6 +1253,25 @@ def build_dashboard(snapshot):
 """
     _make_icons()
     _make_service_worker(snapshot)
+
+    # 云端托管（GitHub Pages）时没有本地服务，页面仍需显示"数据截止/最后更新"。
+    # 生成一份静态心跳到 web/data/ 下，使相对路径 data/heartbeat.json 在两种部署下都能解析。
+    # 只在看板重建时写入，因此不会制造无谓提交。
+    try:
+        os.makedirs(os.path.join(store.ROOT, "web", "data"), exist_ok=True)
+        store.write_json(
+            os.path.join(store.ROOT, "web", "data", "heartbeat.json"),
+            {
+                "last_check": snapshot["generated_at"],
+                "data_changed": True,
+                "last_data_change": snapshot["generated_at"],
+                "schedule": "07:45 / 09:30 / 12:30 / 15:30 / 17:30 / 21:30",
+                "mode": "cloud",
+                "source_errors": snapshot.get("source_errors", {}),
+            },
+        )
+    except Exception:
+        pass
     out = os.path.join(store.ROOT, "web", "index.html")
     tmp = out + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
