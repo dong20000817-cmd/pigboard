@@ -5,6 +5,8 @@ name: 每日更新看板
 on:
   schedule:
     - cron: "45 23 * * *"   # UTC 23:45 = 北京时间次日 07:45
+  push:
+    branches: [main]        # 本地 push（改代码/改登记库）后自动重新发布
   workflow_dispatch: {}      # 支持手动触发
 
 permissions:
@@ -19,6 +21,10 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # 防止自触发死循环：跳过本工作流自己产生的数据提交
+    if: >-
+      github.event_name != 'push' ||
+      !contains(github.event.head_commit.message, '看板数据更新')
     steps:
       - uses: actions/checkout@v4
         with:
