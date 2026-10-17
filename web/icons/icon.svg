@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="104" fill="#15181d"/>
+<text x="256" y="214" font-size="150" text-anchor="middle" fill="#ffffff"
+ font-family="PingFang SC,Hiragino Sans GB,Microsoft YaHei,sans-serif" font-weight="700">生猪</text>
+<text x="256" y="358" font-size="132" text-anchor="middle" fill="#4ade80"
+ font-family="PingFang SC,Hiragino Sans GB,Microsoft YaHei,sans-serif" font-weight="700">¥</text>
+<rect x="96" y="404" width="320" height="14" rx="7" fill="#c0392b"/>
+</svg>

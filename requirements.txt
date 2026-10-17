@@ -1,0 +1,3 @@
+# 仅在需要解析农业农村部官方 XLSX 时依赖 openpyxl；
+# 其余采集逻辑全部使用 Python 标准库。
+openpyxl>=3.1

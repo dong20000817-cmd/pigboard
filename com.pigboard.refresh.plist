@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.pigboard.refresh</string>
+
+  <!-- 每天固定时刻巡检数据源；只有数据或官方发布变化时才改写看板 -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__ROOT__/refresh.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>__ROOT__</string>
+
+  <!-- 07:45 早间更新（赶在 8:00 之前完成） -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>__ROOT__/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>__ROOT__/logs/launchd.err.log</string>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>LowPriorityIO</key>
+  <true/>
+</dict>
+</plist>

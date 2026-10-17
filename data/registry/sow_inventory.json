@@ -1,0 +1,207 @@
+{
+  "indicator": "sow_inventory",
+  "caliber_version": "v1",
+  "title": "能繁母猪存栏",
+  "unit": "万头",
+  "main_caliber": "农业农村部等五部委联合发布《生猪产品数据》· 季度末全国能繁母猪存栏（国家统计局数据，全面统计非样本）",
+  "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局 联合发布",
+  "publisher_note": "季度末能繁母猪绝对值只在季末月的五部委《生猪产品数据》中出现。媒体标题常简写为「国家统计局：…」，正式引用应写「五部委联合发布（国家统计局数据）」。",
+  "moa_monthly_rule": "官方备注原文：季度末月份能繁母猪存栏量为国家统计局数据；非季度末月份，以国家统计局季度末数据为基数，根据农业农村部定点监测的能繁母猪存栏月度环比变化率推算得出。故非季末月无绝对值属正常。",
+  "release_schedule": {
+    "note": "官方页面标注「每年1月20日、4月20日、7月20日、10月20日」发布月度数据；季度末绝对值随季末月一并发布。",
+    "next_expected": [
+      {
+        "period": "2026年三季度末",
+        "expected_date": "2026-10-19",
+        "carrier": "国家统计局《国民经济运行情况》新闻发布会（10:00）",
+        "status": "待发布"
+      },
+      {
+        "period": "2026年9月",
+        "expected_date": "2026-10-20",
+        "carrier": "五部委《生猪产品数据（2026年9月）》",
+        "status": "待发布"
+      }
+    ]
+  },
+  "benchmark": {
+    "name": "全国能繁母猪正常保有量",
+    "value": 3750,
+    "unit": "万头",
+    "effective_from": "2026-05-14",
+    "publisher": "农业农村部",
+    "document": "《生猪产能综合调控实施方案（2026年修订）》（农牧发〔2026〕6号）",
+    "publish_date": "2026-05-14",
+    "source_url": "https://www.agri.cn/zx/nyyw/202605/t20260515_8836676.htm",
+    "note": "自 2024年2月的 3900 万头再次下调。绿色区间由 92%~105% 收紧至 92%~103%；黄色 103%~106% 或 88%~92%；红色 >106% 或 <88%。全国规模猪场保有量稳定在 13 万个以上。文件时限表述为「十五五」初期，未规定具体截止日期。",
+    "history": [
+      {
+        "value": 3900,
+        "effective_from": "2024-02",
+        "note": "2024年2月下调，波动下限由95%调整为92%"
+      },
+      {
+        "value": 3750,
+        "effective_from": "2026-05-14",
+        "note": "2026年修订方案，现行有效"
+      }
+    ]
+  },
+  "points": [
+    {
+      "id": "moa-2024Q4",
+      "period_label": "2024年四季度末",
+      "stat_date": "2024-12-31",
+      "value": 4078,
+      "yoy_pct": -1.6,
+      "yoy_abs": null,
+      "mom_pct_official": 0.4,
+      "mom_abs": null,
+      "mom_pct_computed": null,
+      "pct_of_benchmark": 104.6,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2025-01-20",
+      "source_title": "生猪产品数据（2024年12月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2024/202412/",
+      "kind": "official",
+      "confidence": "high",
+      "note": "相当于当时正常保有量的104.6%。"
+    },
+    {
+      "id": "derived-2025Q2",
+      "period_label": "2025年二季度末",
+      "stat_date": "2025-06-30",
+      "value": 4043,
+      "yoy_pct": 0.1,
+      "yoy_abs": null,
+      "mom_pct_official": 0.1,
+      "mom_abs": null,
+      "mom_pct_computed": 0.1,
+      "pct_of_benchmark": 103.7,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2025-07-21",
+      "source_title": "五部委《生猪产品数据（2025年6月）》（该期官方页面未挂 XLSX，由国家统计局同比口径反推校验）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202506/",
+      "kind": "official",
+      "confidence": "medium",
+      "note": "反推校验值：2026年二季度官方 3780 万头 + 官方同比减少 263 万头 = 4043 万头；占当时正常保有量(3900万头)的 103.7%。官方该期页面未提供 XLSX 附件，故标记为中等可信度。"
+    },
+    {
+      "id": "moa-2025Q3",
+      "period_label": "2025年三季度末",
+      "stat_date": "2025-09-30",
+      "value": 4035,
+      "yoy_pct": -0.7,
+      "yoy_abs": null,
+      "mom_pct_official": -0.2,
+      "mom_abs": null,
+      "mom_pct_computed": -0.2,
+      "pct_of_benchmark": 103.5,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2025-10-20",
+      "source_title": "生猪产品数据（2025年9月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202509/",
+      "kind": "official",
+      "confidence": "high",
+      "note": "官方原表环比为未舍入浮点 -0.00197872866683156，看板展示为 -0.2%。相当于当时正常保有量的103.5%。"
+    },
+    {
+      "id": "moa-2025Q4",
+      "period_label": "2025年四季度末",
+      "stat_date": "2025-12-31",
+      "value": 3961,
+      "yoy_pct": -2.9,
+      "yoy_abs": null,
+      "mom_pct_official": -1.8,
+      "mom_abs": null,
+      "mom_pct_computed": -1.83,
+      "pct_of_benchmark": 101.6,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2026-01-20",
+      "source_title": "生猪产品数据（2025年12月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202512/",
+      "kind": "official",
+      "confidence": "high",
+      "note": "官方备注：相当于正常保有量的101.6%，产能正常，处于绿色区域（当时保有量为3900万头）。"
+    },
+    {
+      "id": "moa-2026Q1",
+      "period_label": "2026年一季度末",
+      "stat_date": "2026-03-31",
+      "value": 3904,
+      "yoy_pct": -3.3,
+      "yoy_abs": null,
+      "mom_pct_official": -1.5,
+      "mom_abs": -57,
+      "mom_pct_computed": -1.44,
+      "pct_of_benchmark": 100.1,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2026-04-27",
+      "source_title": "生猪产品数据（2026年3月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202603/",
+      "kind": "official",
+      "confidence": "high",
+      "note": "官方环比 -1.5%；按上期3961万头算术推算为 -1.44%，两者差异源于环比分母口径，看板以官方值展示并保留算术值备查。"
+    },
+    {
+      "id": "moa-2026Q2",
+      "period_label": "2026年二季度末",
+      "stat_date": "2026-06-30",
+      "value": 3780,
+      "yoy_pct": -6.5,
+      "yoy_abs": -263,
+      "mom_pct_official": -3.2,
+      "mom_abs": -124,
+      "mom_pct_computed": -3.18,
+      "pct_of_benchmark": 100.8,
+      "publisher": "农业农村部等五部委联合发布（国家统计局数据）",
+      "publish_date": "2026-07-23",
+      "source_title": "生猪产品数据（2026年6月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202606/",
+      "source_file": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202606/202607/P020260723514354158918.xlsx",
+      "kind": "official",
+      "confidence": "high",
+      "note": "官方原表数值栏原文：「3780（相当于调控目标的100.8%）」。同比减少263万头。"
+    }
+  ],
+  "sample_watch": {
+    "name": "Mysteel 样本能繁母猪存栏",
+    "kind": "third_party",
+    "sample_size": "钢联综合养殖场样本（口径随月份有 173 家 / 208 家等表述）",
+    "latest_period": "2026年8月底",
+    "latest_value": 482.87,
+    "unit": "万头",
+    "mom_pct": -2.94,
+    "publisher": "上海钢联 Mysteel",
+    "publish_date": "2026-09",
+    "source_url": "https://ncp.mysteel.com/a/26101314/CC397DB22724AE58.html",
+    "note": "第三方样本口径，绝不可与全国官方存栏混淆。该样本自2025年7月高点527.26万头累计去化约9.20%（另有口径称2026年9月样本478.73万头、环比-0.86%）。",
+    "three_way_2026_08": {
+      "period": "2026年8月（规模场样本单月环比）",
+      "卓创资讯": -1.67,
+      "上海钢联": -3.01,
+      "涌益咨询": -2.37,
+      "unit": "%",
+      "source_url": "https://www.sohu.com/a/1086590262_122014422",
+      "note": "三方样本量不同，仅可同向参考，不可平均、不可拼接。"
+    },
+    "disclaimer": "样本企业口径，仅代表样本内情况，不代表全国产能水平。"
+  },
+  "corrections": [
+    {
+      "wrong": "正常保有量 3950 万头",
+      "right": "3750 万头",
+      "note": "3950 万头是 2020 年 10 月的历史存栏水平，被部分媒体误当政策目标；官方现行目标为 3750 万头左右。"
+    },
+    {
+      "wrong": "全国调减 100 万头",
+      "right": "系对 25 家头部猪企的阶段性任务（2025年9月提出、2026年1月底前完成）",
+      "note": "媒体转述，未找到官方文件编号，非全国保有量目标。"
+    },
+    {
+      "wrong": "3650 万头目标",
+      "right": "未见于任何官方文件，且已被 2026-05 官方 3750 万头取代",
+      "note": "2026年3月会前流传版本。"
+    }
+  ]
+}

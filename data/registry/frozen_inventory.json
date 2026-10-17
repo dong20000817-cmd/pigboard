@@ -1,0 +1,123 @@
+{
+  "indicator": "frozen_inventory",
+  "caliber_version": "v1",
+  "title": "猪肉冻品库容率",
+  "unit": "%",
+  "warning": "本指标不存在官方口径。以下全部为第三方样本口径；不同机构的样本池不同，数值水平差异可达 10 个百分点以上，严禁互相拼接或跨机构比较。",
+  "definition": "冻品库容率 = 样本屠宰企业冻品猪肉库存量 ÷ 样本企业有效库容 × 100%，反映样本企业冻品库存压力。",
+  "known_gaps": [
+    "样本屠宰企业家数、覆盖省份数、精确定义：Mysteel / 卓创 / 涌益 三家公开页面均未披露，属付费口径。",
+    "涌益咨询冻品库容率：未找到可核查的公开数值。"
+  ],
+  "series": [
+    {
+      "id": "mysteel-key-slaughter",
+      "publisher": "上海钢联 Mysteel（钢联数据）",
+      "sample": "国内重点屠宰企业（周度监测）",
+      "sample_note": "机构仅披露「国内重点屠宰企业」这一表述，未公开样本家数与覆盖省份。多个券商/期货周报明示引用钢联数据，数值、环比、同比四源一致。",
+      "latest": {
+        "period_label": "截至2026-10-09当周",
+        "stat_date": "2026-10-09",
+        "value": 32.14,
+        "change_pp": 0.0,
+        "yoy_pp": 14.39,
+        "publish_date": "2026-10-12",
+        "source_title": "华泰期货 / 国新国证期货 生猪周报（均明示引用钢联数据）",
+        "source_url": "https://finance.sina.cn/futuremarket/qsyw/2026-10-12/detail-iniuxrzp7170876.d.html",
+        "note": "环比持平，同比 +14.39 个百分点。另经猪易网（https://cj.zhue.com.cn/huixun/zhuanyebaodao/2026/1012/405203.html）与新浪财经（https://finance.sina.cn/2026-10-13/detail-iniuzuyp7276048.d.html）两路独立来源核对，数值一致。"
+      },
+      "points": [
+        {
+          "period_label": "截至2026-10-02当周",
+          "stat_date": "2026-10-02",
+          "value": 32.20,
+          "yoy_pp": 14.55,
+          "publish_date": "2026-10-05",
+          "source_title": "机构周报引用钢联数据",
+          "source_url": "https://m.cngold.org/futures/xw10784547.html",
+          "note": "前一周值，用于验证环比持平。"
+        },
+        {
+          "period_label": "2026-07-31",
+          "stat_date": "2026-07-31",
+          "value": 33.01,
+          "publish_date": "2026-08-04",
+          "source_title": "机构周报引用钢联数据",
+          "source_url": "https://m.cngold.org/futures/xw10784547.html",
+          "note": "7 月末阶段高点，此后缓慢回落。"
+        },
+        {
+          "period_label": "2026年第34周（9月中旬）",
+          "stat_date": "2026-09-18",
+          "value": 32.56,
+          "yoy_pp": 15.0,
+          "publish_date": "2026-09-24",
+          "source_title": "猪价连涨4周却依旧亏钱！旺季不旺真相找到了？",
+          "source_url": "https://www.hnxmsyzz.com/quote/show-8321.html",
+          "note": "对应冻猪肉库存约 31.7 万吨。"
+        }
+      ],
+      "kind": "third_party",
+      "confidence": "medium",
+      "confidence_reason": "四路独立来源互证数值一致，但样本细节未公开，且与机构自身早前预测存在冲突（见 conflicts）。",
+      "disclaimer": "第三方样本口径，仅代表样本屠宰企业情况，不代表全国冻品库存水平。"
+    },
+    {
+      "id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "sample": "卓创资讯样本屠宰企业（周度监测）",
+      "sample_note": "与钢联样本不同源。数值水平差异大（卓创 2026-03 为 21.88%，钢联 2026-10 为 32.14%），严禁与钢联序列直接比较或拼接。",
+      "latest": {
+        "period_label": "2026年3月底",
+        "stat_date": "2026-03-31",
+        "value": 21.88,
+        "change_pp": 2.18,
+        "publish_date": "2026-04-24",
+        "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+        "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+        "note": "新华财经刊发卓创资讯数据。"
+      },
+      "points": [
+        {
+          "period_label": "2026年2月底",
+          "stat_date": "2026-02-28",
+          "value": 19.70,
+          "publish_date": "2026-04-24",
+          "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+          "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+          "note": "2025年10月下旬起由 21.75% 持续降至 19.70%，累计下降 2.05 个百分点。"
+        },
+        {
+          "period_label": "2025年10月下旬",
+          "stat_date": "2025-10-25",
+          "value": 21.75,
+          "publish_date": "2026-04-24",
+          "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+          "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+          "note": "本轮下降起点。"
+        }
+      ],
+      "kind": "third_party",
+      "confidence": "medium",
+      "disclaimer": "第三方样本口径，仅代表样本屠宰企业情况，不代表全国冻品库存水平。"
+    }
+  ],
+  "conflicts": [
+    {
+      "issue": "Mysteel 自身预测区间与当前引用值不兼容",
+      "detail": "Mysteel 2026-02-13 解读文章预测「2026 年国内重点屠宰企业冻品库容率全年均值 19.09%，最高 6 月 20.00%，最低 2 月 17.40%」；而 7–10 月各券商/期货周报引用的钢联数值为 32%~33%。两者相差约 13 个百分点，不可能属于同一样本池。",
+      "source_url": "https://m.mysteel.com/a/26021316/21F181A13DDD26BE_abc.html",
+      "handling": "在取得 Mysteel 原始周报口径说明前，32.14% 仅作「机构转述的最新公开值」展示，不与卓创序列拼接、不与 Mysteel 早前预测并列比较。"
+    },
+    {
+      "issue": "「库容量」与「库容率」是两个指标",
+      "detail": "Mysteel 另有原始披露：重点省份样本屠宰企业猪肉库容量 309,312 千克（截至 2026-10-08，逐省列示）。这是绝对库存量，不是库容率，不可混用。",
+      "source_url": "https://ncp.mysteel.com/a/26100915/FD1A87EB02732FC2.html",
+      "handling": "本看板只跟踪「库容率」，库容量仅在此备注，不进入指标序列。"
+    }
+  ],
+  "pending": [
+    "钢联冻品库容率下一期（截至 2026-10-16 当周，约 2026-10-19 发布）。",
+    "向机构索取或购买样本口径说明，以解决 conflicts 中的第一项。"
+  ]
+}

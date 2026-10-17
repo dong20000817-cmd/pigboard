@@ -1,0 +1,107 @@
+{
+  "indicator": "cull_sow_ratio",
+  "caliber_version": "v1",
+  "title": "淘汰母猪 / 商品猪 价格比",
+  "unit": "%",
+  "formula": "淘汰母猪出栏均价 ÷ 同期商品猪（外三元标猪）出栏均价 × 100%",
+  "unit_rule": "分子与分母必须同为 元/公斤。若来源以 元/斤 报出，须先 ×2 换算，禁止直接相除。",
+  "interpretation": {
+    "low": "比值越低 → 淘汰母猪越卖不上价 → 市场淘汰压力越大、去产能越急。",
+    "high": "比值越高 → 淘汰母猪相对抗跌 → 淘汰多为正常更新，去产能温和。",
+    "reference_band": "经验区间约 45%~75%；低于 50% 通常对应深度亏损与加速去产能。"
+  },
+  "disclaimer": "本比值为本看板依据第三方样本价格自行计算，非任何机构原发布值；分子为第三方样本口径，分母为全国综合均价，两者样本范围不完全一致。",
+  "points": [
+    {
+      "stat_date": "2026-10-02",
+      "cull_sow_price": 6.84,
+      "commercial_hog_price": 10.26,
+      "commercial_hog_price_date": "2026-10-07",
+      "ratio_pct": 66.7,
+      "cull_sow_wow_pct": -3.25,
+      "commercial_hog_wow_pct": 2.09,
+      "publisher": "上海钢联 Mysteel 样本（比值经申港证券计算并披露）",
+      "publish_date": "2026-10-12",
+      "source_title": "农林牧渔行业研究周报：商品猪出栏均价较节前震荡下跌 出栏均重转跌（申港证券）",
+      "source_url": "http://field.10jqka.com.cn/20261012/c680566760.shtml",
+      "kind": "third_party",
+      "confidence": "high",
+      "note": "原文：截至10月2日，钢联样本企业淘汰母猪均价6.84元/kg，周环比下跌3.25%，淘汰母猪与商品猪价格比值0.67。截至10月7日，商品猪出栏均价10.26元/kg，周环比上涨2.09%。",
+      "cross_check": "6.84 ÷ 10.26 = 66.7%，与研报披露的 0.67 一致。"
+    }
+  ],
+  "supporting": [
+    {
+      "name": "淘汰母猪屠宰量",
+      "period_label": "2026年8月",
+      "value": 30.0,
+      "unit": "万头",
+      "change": "+6.1 万头（环比）",
+      "publisher": "上海钢联 Mysteel 样本",
+      "publish_date": "2026-10-12",
+      "source_url": "http://field.10jqka.com.cn/20261012/c680566760.shtml",
+      "note": "8月淘汰母猪屠宰量环比增加6.1万头至逼近30万头，创阶段新高；6-8月屠宰量逐月增加，淘汰节奏加快。数值'逼近30万头'为原文表述，非精确值。"
+    },
+    {
+      "name": "三方样本规模场能繁母猪单月去化幅度",
+      "period_label": "2026年8月",
+      "publisher": "卓创资讯 / 上海钢联 / 涌益咨询",
+      "publish_date": "2026-10-12",
+      "source_url": "https://www.sohu.com/a/1086590262_122014422",
+      "note": "卓创 -1.67%、钢联 -3.01%、涌益 -2.37%，为年内最大单月降幅。三方样本量不同，仅同向参考，不可平均。"
+    },
+    {
+      "name": "二元母猪均价（补栏意愿）",
+      "period_label": "截至2026年9月25日",
+      "value": 1292.86,
+      "unit": "元/头",
+      "change": "周环比持平",
+      "publisher": "上海钢联 Mysteel 样本",
+      "publish_date": "2026-10-12",
+      "source_url": "http://field.10jqka.com.cn/20261012/c680566760.shtml",
+      "note": "二元母猪价格持稳而淘汰母猪价格下跌，说明补栏停滞、淘汰加速，是去产能的同步信号。"
+    }
+  ],
+  "reference_points": [
+    {
+      "stat_date": "2026-10-14",
+      "cull_sow_price": 6.30,
+      "commercial_hog_price": 9.98,
+      "ratio_pct": 63.1,
+      "publisher": "搜猪网",
+      "publish_date": "2026-10-14",
+      "source_url": "https://www.soozhu.com/",
+      "kind": "third_party",
+      "confidence": "low",
+      "note": "跨机构跨日参考值，不可与主口径序列拼接。"
+    },
+    {
+      "stat_date": "2026-09-15",
+      "cull_sow_price": 7.07,
+      "commercial_hog_price": 10.68,
+      "ratio_pct": 66.2,
+      "publisher": "卓创资讯",
+      "publish_date": "2026-10-13",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20261013/654165.html",
+      "kind": "third_party",
+      "confidence": "low",
+      "note": "9月中旬卓创口径，用作独立佐证：与钢联 0.67 同向。"
+    },
+    {
+      "stat_date": "2026-10-14",
+      "cull_sow_price": 7.23,
+      "commercial_hog_price": 9.86,
+      "ratio_pct": 73.3,
+      "publisher": "上海钢联 Mysteel（淘汰母猪为分省挂牌价中值，非全国均价）",
+      "publish_date": "2026-10-14",
+      "source_url": "https://ncp.mysteel.com/a/26101411/EE0D8F8548DE2F9B.html",
+      "kind": "third_party",
+      "confidence": "low",
+      "note": "当日 Mysteel 全国外三元出栏均价 9.86 元/公斤；淘汰母猪为分省牌价：江西九江一胎7.8/多胎7.2、湖北襄阳一胎7.6/多胎7.1、武汉一胎7.8/多胎7.2、贵州三胎以上6.65。分省单点牌价不可跨省平均，此处仅取区间中值示意，比值区间实为 67%~79%。"
+    }
+  ],
+  "pending": [
+    "淘汰母猪价格为周度披露，下一期（约10月9日/10月16日）发布后需更新并重算比值。",
+    "Mysteel 全国口径「淘汰母猪均价」当日原始发布页未找到，全国均价目前仅见于券商转述。"
+  ]
+}
