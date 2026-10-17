@@ -46,20 +46,44 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== location.origin) return;
 
   if (req.mode === 'navigate') {
+    const APP_ROOT = new URL('./', self.registration.scope).href;
+    const NET_TIMEOUT = 3000;  // 网络慢时先用缓存秒开，后台再更新
+
     e.respondWith((async function () {
-      try {
-        const r = await fetch(req);
-        if (r && r.ok) {
+      const cacheNav = async function (r) {
+        try {
           const c = await caches.open(VERSION);
           // 同时按"本次请求 URL"和"应用根"保存，兼容子路径与根路径部署
           try { await c.put(req, r.clone()); } catch (_) {}
-          try { await c.put(new URL('./', self.registration.scope).href, r.clone()); } catch (_) {}
-        }
-        return r;
+          try { await c.put(APP_ROOT, r.clone()); } catch (_) {}
+        } catch (_) {}
+      };
+
+      let timer;
+      try {
+        const net = await Promise.race([
+          fetch(req),
+          new Promise(function (_, rej) {
+            timer = setTimeout(function () { rej(new Error('net-timeout')); }, NET_TIMEOUT);
+          })
+        ]);
+        clearTimeout(timer);
+        if (net && net.ok) cacheNav(net);
+        return net;
       } catch (_) {
-        const hit = (await caches.match(req)) ||
-                    (await caches.match(new URL('./', self.registration.scope).href));
-        return hit || new Response(
+        clearTimeout(timer);
+        const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
+        if (hit) {
+          // 命中缓存：立即返回，同时后台静默更新
+          fetch(req).then(cacheNav).catch(function () {});
+          return hit;
+        }
+        try {
+          const net = await fetch(req);
+          if (net && net.ok) cacheNav(net);
+          return net;
+        } catch (__) { /* 落到离线页 */ }
+        return new Response(
           '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
           '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
           '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
