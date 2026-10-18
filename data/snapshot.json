@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-18T21:30:25+08:00",
+  "generated_at": "2026-10-18T21:34:21+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -1785,6 +1785,28 @@
             "note": "相当于当时正常保有量的104.6%。"
           },
           {
+            "id": "moa-auto-2025-03-31",
+            "period_label": "2025年1季度末",
+            "stat_date": "2025-03-31",
+            "value": 4039,
+            "value_raw": "4039（相当于正常保有量的103.6%，产能正常，处于绿色区域）",
+            "yoy_pct": 1.2,
+            "yoy_abs": null,
+            "mom_pct_official": -1.0,
+            "mom_abs": null,
+            "mom_pct_computed": null,
+            "pct_of_benchmark": 103.6,
+            "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
+            "publish_date": "2025-04-25",
+            "source_title": "生猪产品数据（2025年3月）",
+            "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/",
+            "source_file": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/202504/P020250425570366125575.xlsx",
+            "kind": "official",
+            "confidence": "high",
+            "auto": true,
+            "note": "由官方《生猪产品数据》XLSX 自动抓取并解析；发布日期取自官方文件名日期段。"
+          },
+          {
             "id": "derived-2025Q2",
             "period_label": "2025年二季度末",
             "stat_date": "2025-06-30",
@@ -1963,12 +1985,14 @@
             "note": "2026年3月会前流传版本。"
           }
         ],
-        "auto_note": [],
+        "auto_note": [
+          "官方自动源新增 1 个季度观测"
+        ],
         "conflicts": [],
         "official_index": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/"
       },
       "notes": "官方数据仅在发布日更新，非发布日不得改动看板该模块。",
-      "value_hash": "fbf3d02e07a75b78",
+      "value_hash": "aea9c91bcbd633c7",
       "hash_changed": true
     },
     "frozen_inventory": {
