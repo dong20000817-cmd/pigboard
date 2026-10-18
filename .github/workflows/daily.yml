@@ -21,6 +21,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 15      # 采集卡住时自动失败，不拖到 6 小时
     # 防止自触发死循环：跳过本工作流自己产生的数据提交
     if: >-
       github.event_name != 'push' ||

@@ -4,11 +4,14 @@
 import gzip
 import io
 import json
+import socket
 import ssl
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+socket.setdefaulttimeout(20)  # SSL 握手也受此约束
 
 UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "

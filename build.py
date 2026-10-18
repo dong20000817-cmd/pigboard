@@ -380,40 +380,100 @@ def card_sow(m):
 
 def card_frozen(m):
     h = m["headline"]
+    hist = m["detail"].get("history") or []
+    series_list = m["detail"]["series"]
+
+    # ---- 图表：按机构分组，逐点保留出处，供点选查看 ----
+    groups = {}
+    for p in hist:
+        pid = p.get("publisher_id") or p.get("publisher")
+        groups.setdefault(pid, []).append(p)
+    colors = {"mysteel-key-slaughter": "#c0392b", "sci-sample-slaughter": "#2c7fb8"}
+    names = {"mysteel-key-slaughter": "钢联（重点屠宰企业）", "sci-sample-slaughter": "卓创（样本屠宰企业）"}
+    chart_series = []
+    for pid, pts in groups.items():
+        pts = sorted(pts, key=lambda x: x["stat_date"])
+        notes = {
+            p["stat_date"]: {
+                "publisher": p.get("publisher") or names.get(pid, pid),
+                "publish_date": p.get("publish_date"),
+                "source_title": p.get("source_title"),
+                "source_url": p.get("source_url"),
+                "note": p.get("note"),
+                "period_label": p.get("period_label"),
+            }
+            for p in pts
+        }
+        chart_series.append({
+            "id": pid,
+            "name": names.get(pid, pid),
+            "color": colors.get(pid, "#6b7280"),
+            "points": [[p["stat_date"], p["value"]] for p in pts],
+            "notes": notes,
+        })
+    chart_series.sort(key=lambda s: 0 if s["id"] == "mysteel-key-slaughter" else 1)
+    chart_json = json.dumps({"unit": "%", "digits": 2, "axisDigits": 1, "series": chart_series}, ensure_ascii=False)
+    n_points = sum(len(s["points"]) for s in chart_series)
+
+    # ---- 明细表：每家机构默认折叠，避免整块卡片过长 ----
     series_html = ""
-    for s in m["detail"]["series"]:
-        rows = ""
-        for p in [s["latest"]] + list(s.get("points", [])):
+    for s in series_list:
+        lookup = {p["stat_date"]: p for p in [s["latest"]] + list(s.get("points", []))}
+        hist_pts = [p for p in hist if p.get("publisher_id") == s["id"]]
+        if not hist_pts:
+            hist_pts = list(lookup.values())
+        rows, seen = "", set()
+        for p in sorted(hist_pts, key=lambda x: x["stat_date"], reverse=True):
+            if p["stat_date"] in seen:
+                continue
+            seen.add(p["stat_date"])
+            meta = lookup.get(p["stat_date"], {})
             rows += (
                 f'<tr><td>{esc(p.get("period_label"))}</td>'
                 f'<td class="mono dim">{esc(p["stat_date"])}</td>'
                 f'<td class="num">{fmt_num(p["value"])}%</td>'
-                f'<td class="num">{fmt_num(p.get("change_pp"), 2) + "pp" if p.get("change_pp") is not None else "—"}</td>'
-                f'<td class="num">{fmt_num(p.get("yoy_pp"), 1) + "pp" if p.get("yoy_pp") is not None else "—"}</td>'
+                f'<td class="num">{fmt_num(meta.get("change_pp"), 2) + "pp" if meta.get("change_pp") is not None else "—"}</td>'
+                f'<td class="num">{fmt_num(meta.get("yoy_pp"), 1) + "pp" if meta.get("yoy_pp") is not None else "—"}</td>'
                 f'<td class="mono dim">{esc(p["publish_date"])}</td></tr>'
             )
         series_html += f"""
-  <div class="subbox thirdparty">
-    <h4>{esc(s['publisher'])} <span class="badge thirdparty">第三方样本</span></h4>
-    <p class="dim">样本：{esc(s['sample'])}</p>
-    <div class="tbl-wrap">
-      <table class="tbl small">
-        <thead><tr><th>期间</th><th>统计日</th><th>库容率</th><th>环比</th><th>同比</th><th>发布日期</th></tr></thead>
-        <tbody>{rows}</tbody>
-      </table>
+  <details class="fold">
+    <summary>{esc(s['publisher'].replace('（钢联数据）','').replace(' SCI',''))} · {len(seen)} 个披露点</summary>
+    <div class="fold-body">
+      <p class="dim">样本：{esc(s['sample'])}</p>
+      <div class="tbl-wrap">
+        <table class="tbl small">
+          <thead><tr><th>期间</th><th>统计日</th><th>库容率</th><th>环比</th><th>同比</th><th>发布日期</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+      <p class="dim">{esc(s['sample_note'])}</p>
     </div>
-    <p class="dim">{esc(s['sample_note'])}</p>
-  </div>"""
+  </details>"""
+
     conf = m["detail"].get("conflicts", [])
-    conf_html = ('<div class="subbox conflict"><h4>⚠ 口径冲突与存疑项（必须提示）</h4><ul class="tight">'
-                 + "".join(f'<li><b>{esc(c["issue"])}</b><br>{esc(c["detail"])}<br>'
-                           f'<span class="dim">处理方式：{esc(c["handling"])} · '
-                           f'<a href="{esc(c["source_url"])}" target="_blank" rel="noreferrer">出处</a></span></li>'
-                           for c in conf)
-                 + '</ul></div>') if conf else ''
+    conf_html = ""
+    if conf:
+        conf_html = (
+            f'<details class="fold conflict"><summary>⚠ 口径冲突与存疑项（{len(conf)} 项）</summary>'
+            '<div class="fold-body"><ul class="tight">'
+            + "".join(f'<li><b>{esc(c["issue"])}</b><br>{esc(c["detail"])}<br>'
+                      f'<span class="dim">处理方式：{esc(c["handling"])} · '
+                      f'<a href="{esc(c["source_url"])}" target="_blank" rel="noreferrer">出处</a></span></li>'
+                      for c in conf)
+            + '</ul></div></details>'
+        )
+
     gaps = m["detail"].get("known_gaps", [])
-    gap_html = ('<div class="subbox"><h4>公开信息缺口（未找到，不猜测）</h4><ul class="tight">'
-                + "".join(f'<li>{esc(g)}</li>' for g in gaps) + '</ul></div>') if gaps else ''
+    gap_html = ""
+    if gaps:
+        gap_html = (
+            f'<details class="fold gap"><summary>公开信息缺口 · 未找到，不猜测（{len(gaps)} 项）</summary>'
+            '<div class="fold-body"><ul class="tight">'
+            + "".join(f'<li>{esc(g)}</li>' for g in gaps)
+            + '</ul></div></details>'
+        )
+
     return f"""
 <section class="card wide">
   <header class="card-h">
@@ -428,8 +488,25 @@ def card_frozen(m):
     <div class="hero-p">当前主口径：{esc(m['publisher'])}（{esc(m['sample'])}）</div>
   </div>
   <div class="chips">{''.join(chip(c['label'], c['value']) for c in h['extra_chips'])}</div>
-  <p class="inline-note">定义：{esc(m['detail']['definition'])}</p>
+
+  <div class="range-bar">
+    <div class="range-tabs" role="tablist" aria-label="时间区间">
+      <button type="button" data-d="180" role="tab">近 6 个月</button>
+      <button type="button" data-d="365" role="tab" class="on">近 12 个月</button>
+      <button type="button" data-d="0" role="tab">全部</button>
+    </div>
+    <div class="range-hint">点按曲线上的任意一点，查看机构、统计日与原文出处</div>
+  </div>
+  <div class="chart-legend" id="frozenLegend"></div>
+  <div class="chart-box">
+    <svg id="frozenChart" viewBox="0 0 820 320" preserveAspectRatio="none" aria-label="冻品库容率双口径走势"></svg>
+    <div class="chart-tip" id="frozenTip" hidden></div>
+  </div>
+  <p class="chart-note">共 {n_points} 个公开披露点位。两条线属于不同样本池，只能分别看趋势，<b>禁止拼接、平均或互相比较绝对值</b>；
+    相邻点之间以直线连接仅表示方向，不代表期间逐日观测。</p>
+
   {series_html}
+  <p class="inline-note">定义：{esc(m['detail']['definition'])}</p>
   {conf_html}
   {gap_html}
   <details class="src">
@@ -443,7 +520,8 @@ def card_frozen(m):
       <dt>备注</dt><dd>{esc(m['notes'])}</dd>
     </dl>
   </details>
-</section>"""
+</section>
+<script id="frozenData" type="application/json">{chart_json}</script>"""
 
 
 def card_cull(m):
@@ -463,9 +541,9 @@ def card_cull(m):
     ref_html = ""
     if refs:
         ref_html = (
-            '<div class="subbox"><h4>其他机构参考值 <span class="badge thirdparty">不可拼接</span></h4>'
-            '<p class="dim">以下为跨机构、跨日期的独立观测，仅用于判断比值所处区间，'
-            '绝不并入上方主口径序列。</p>'
+            f'<details class="fold"><summary>其他机构参考值 · 不可拼接（{len(refs)} 项）</summary>'
+            '<div class="fold-body">'
+            '<p class="dim">以下为跨机构、跨日期的独立观测，仅用于判断比值所处区间，绝不并入主口径序列。</p>'
             '<div class="tbl-wrap"><table class="tbl small">'
             '<thead><tr><th>来源</th><th>统计日</th><th>淘汰母猪</th>'
             '<th>商品猪</th><th>比值</th></tr></thead><tbody>'
@@ -476,8 +554,64 @@ def card_cull(m):
                 f'<td class="num">{fmt_num(r["ratio_pct"], 1)}%</td></tr>'
                 for r in refs
             )
-            + '</tbody></table></div></div>'
+            + '</tbody></table></div></div></details>'
         )
+
+    # ---- 图表：卓创口径月度自建比值（线） + 钢联主口径当期点（点） ----
+    trend = d.get("trend") or []
+    trend_pts = [[t["stat_date"], t["ratio_pct"]] for t in trend]
+    trend_notes = {
+        t["stat_date"]: {
+            "publisher": "卓创 / 中国养猪网",
+            "publish_date": t.get("publish_date"),
+            "source_title": t.get("source_title"),
+            "source_url": t.get("source_url"),
+            "note": f'淘汰母猪 {t["cull_sow_price"]:.2f} ÷ 商品猪 {t["commercial_hog_price"]:.2f} = {t["ratio_pct"]:.2f}%',
+            "period_label": t.get("period_label"),
+        }
+        for t in trend
+    }
+    main_note = {
+        p["stat_date"]: {
+            "publisher": p.get("publisher") or "上海钢联 Mysteel 样本",
+            "publish_date": p.get("publish_date"),
+            "source_title": p.get("source_title"),
+            "source_url": p.get("source_url"),
+            "note": f'淘汰母猪 {p["cull_sow_price"]:.2f} ÷ 商品猪 {p["commercial_hog_price"]:.2f} = {p["ratio_pct"]:.2f}%（主口径）',
+            "period_label": "当期主口径",
+        }
+    }
+    chart_json = json.dumps({
+        "unit": "%",
+        "digits": 1,
+        "minSpan": 10,
+        "series": [
+            {"id": "sci-trend", "name": "卓创口径 · 月度自建比值", "color": "#c0392b",
+             "points": trend_pts, "notes": trend_notes},
+            {"id": "mysteel", "name": "钢联主口径 · 当期", "color": "#2c7fb8",
+             "points": [[p["stat_date"], p["ratio_pct"]]], "notes": main_note},
+        ],
+    }, ensure_ascii=False)
+
+    trend_rows = "".join(
+        f'<tr><td>{esc(t.get("period_label"))}</td><td class="mono dim">{esc(t["stat_date"])}</td>'
+        f'<td class="num">{fmt_num(t["cull_sow_price"])}</td>'
+        f'<td class="num">{fmt_num(t["commercial_hog_price"], 3)}</td>'
+        f'<td class="num"><b>{fmt_num(t["ratio_pct"], 1)}%</b></td>'
+        f'<td><a href="{esc(t.get("source_url", ""))}" target="_blank" rel="noreferrer">原文</a></td></tr>'
+        for t in trend
+    )
+    trend_html = ""
+    if trend:
+        trend_html = (
+            f'<details class="fold"><summary>月度趋势点位明细（{len(trend)} 项）</summary>'
+            '<div class="fold-body"><div class="tbl-wrap"><table class="tbl small">'
+            '<thead><tr><th>期间</th><th>统计日</th><th>淘汰母猪</th><th>商品猪</th><th>比值</th><th>出处</th></tr></thead>'
+            f'<tbody>{trend_rows}</tbody></table></div>'
+            '<p class="dim">分子为卓创淘汰母猪月均价；分母为同期全国外三元月均价（中国养猪网日线按月平均）。'
+            '两者样本不同，比值为本看板自建，仅用于看趋势。</p></div></details>'
+        )
+
     return f"""
 <section class="card wide">
   <header class="card-h">
@@ -495,6 +629,23 @@ def card_cull(m):
     </div>
     <div class="gauge-legend"><span>0%</span><span>经验区间 45%~75%</span><span>100%</span></div>
   </div>
+
+  <div class="range-bar">
+    <div class="range-tabs" role="tablist" aria-label="时间区间">
+      <button type="button" data-d="90" role="tab">近 3 个月</button>
+      <button type="button" data-d="180" role="tab" class="on">近 6 个月</button>
+      <button type="button" data-d="0" role="tab">全部</button>
+    </div>
+    <div class="range-hint">点按曲线上的任意一点，查看分子、分母与原文出处</div>
+  </div>
+  <div class="chart-legend" id="ratioLegend"></div>
+  <div class="chart-box">
+    <svg id="ratioChart" viewBox="0 0 820 320" preserveAspectRatio="none" aria-label="淘汰母猪与商品猪价格比走势"></svg>
+    <div class="chart-tip" id="ratioTip" hidden></div>
+  </div>
+  <p class="chart-note">红线为<b>卓创口径月度自建比值</b>：卓创淘汰母猪月均价 ÷ 同期全国外三元月均价，按月累积；
+    蓝点为<b>钢联主口径当期值</b>，两者样本不同，仅同图对照，不合并为一条序列。</p>
+
   <div class="two-col">
     <div class="subbox">
       <h4>怎么读这个比值</h4>
@@ -510,6 +661,7 @@ def card_cull(m):
     </div>
   </div>
   <div class="alert soft"><b>口径声明：</b>{esc(d['disclaimer'])}</div>
+  {trend_html}
   {ref_html}
   <details class="src">
     <summary>口径与来源</summary>
@@ -522,7 +674,8 @@ def card_cull(m):
       <dt>校验</dt><dd>{esc(p.get('cross_check', '—'))}</dd>
     </dl>
   </details>
-</section>"""
+</section>
+<script id="ratioData" type="application/json">{chart_json}</script>"""
 
 
 CARD_FN = {
@@ -546,7 +699,7 @@ SPOT_JS = r"""
   var tip   = document.getElementById('spotTip');
   var box   = svg.parentElement;
   var stats = document.getElementById('spotStats');
-  var tabs  = document.querySelectorAll('.range-tabs button');
+  var tabs  = svg.closest('section').querySelectorAll('.range-tabs button');
 
   var W = 820, H = 300;
   var P = {l:48, r:16, t:18, b:36};
@@ -693,7 +846,7 @@ SPOT_JS = r"""
   var down = false;
   box.addEventListener('pointerdown', function(e){
     down = true;
-    box.setPointerCapture && box.setPointerCapture(e.pointerId);
+    try { box.setPointerCapture && box.setPointerCapture(e.pointerId); } catch(_) {}
     showAt(idxFromX(e.clientX));
   });
   box.addEventListener('pointermove', function(e){
@@ -717,6 +870,171 @@ SPOT_JS = r"""
   });
 
   build(30);
+})();
+"""
+
+
+MULTI_CHART_JS = r"""
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function init(cfg){
+    var root=document.getElementById(cfg.dataId);
+    var svg=document.getElementById(cfg.svgId);
+    var tip=document.getElementById(cfg.tipId);
+    var legend=document.getElementById(cfg.legendId);
+    if(!root||!svg) return;
+    var D; try{D=JSON.parse(root.textContent);}catch(e){return;}
+    var all=D.series||[];
+    if(!all.length) return;
+    var W=820,H=320,P={l:54,r:22,t:18,b:38};
+    var vis={}; all.forEach(function(s){vis[s.id]=true;});
+    var span=cfg.defaultSpan||0, sel=null, pts=[];
+    var box=svg.parentElement;
+    var sect=svg.closest('section');
+
+    function short(d){return d.slice(5).replace('-','/');}
+    function fmt(v,d){d=(d==null?D.digits:d);var k=Math.pow(10,d);return (Math.round(v*k)/k).toFixed(d);}
+    function fmtAxis(v){return fmt(v,D.axisDigits==null?D.digits:D.axisDigits);}
+    function maxDate(){var m='';all.forEach(function(s){s.points.forEach(function(p){if(p[0]>m)m=p[0];});});return m;}
+    function cutoff(){if(!span)return '';var m=new Date(maxDate());m.setDate(m.getDate()-span);return m.toISOString().slice(0,10);}
+
+    function visibleSeries(){
+      var c=cutoff();
+      return all.filter(function(s){return vis[s.id];}).map(function(s){
+        return {id:s.id,name:s.name,color:s.color,notes:s.notes,
+          points:s.points.filter(function(p){return !c||p[0]>=c;})};
+      }).filter(function(s){return s.points.length>0;});
+    }
+
+    function draw(){
+      var ss=visibleSeries();
+      if(!ss.length){svg.innerHTML='';if(tip)tip.hidden=true;return;}
+      var dates={}; ss.forEach(function(s){s.points.forEach(function(p){dates[p[0]]=1;});});
+      var ds=Object.keys(dates).sort();
+      var t0=new Date(ds[0]).getTime(), t1=new Date(ds[ds.length-1]).getTime();
+      var lo=Infinity,hi=-Infinity;
+      ss.forEach(function(s){s.points.forEach(function(p){lo=Math.min(lo,p[1]);hi=Math.max(hi,p[1]);});});
+      if(hi-lo<1e-9){hi+=1;lo-=1;}
+      var ms=D.minSpan||0;
+      if(ms&&hi-lo<ms){var mid=(hi+lo)/2;lo=mid-ms/2;hi=mid+ms/2;}
+      var pad=(hi-lo)*0.14; lo-=pad; hi+=pad;
+      var iw=W-P.l-P.r, ih=H-P.t-P.b;
+      function X(d){return t1===t0?P.l+iw/2:P.l+(new Date(d).getTime()-t0)/(t1-t0)*iw;}
+      function Y(v){return P.t+(1-(v-lo)/(hi-lo))*ih;}
+
+      var g='';
+      for(var i=0;i<=4;i++){
+        var y=P.t+i/4*ih, val=hi-(i/4)*(hi-lo);
+        g+='<line x1="'+P.l+'" y1="'+y.toFixed(1)+'" x2="'+(W-P.r)+'" y2="'+y.toFixed(1)+'" stroke="#eef0f3" stroke-width="1"/>';
+        g+='<text x="'+(P.l-10)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="11.5" fill="#9aa1a9">'+fmtAxis(val)+'</text>';
+      }
+      var lab=[0,Math.floor((ds.length-1)/2),ds.length-1].filter(function(v,i,a){return a.indexOf(v)===i;});
+      lab.forEach(function(i){
+        var anchor=i===0?'start':(i===ds.length-1?'end':'middle');
+        g+='<text x="'+X(ds[i]).toFixed(1)+'" y="'+(H-14)+'" text-anchor="'+anchor+'" font-size="11.5" fill="#9aa1a9">'+short(ds[i])+'</text>';
+      });
+
+      pts=[];
+      ss.forEach(function(s){
+        var coords=s.points.map(function(p){return {d:p[0],v:p[1],x:X(p[0]),y:Y(p[1]),s:s};});
+        coords.forEach(function(c){pts.push(c);});
+        if(coords.length>=2){
+          var path=coords.map(function(c,i){return (i?'L':'M')+c.x.toFixed(1)+' '+c.y.toFixed(1);}).join(' ');
+          g+='<path d="'+path+'" fill="none" stroke="'+s.color+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+        }
+        coords.forEach(function(c){
+          var big=s.points.length===1;
+          g+='<circle cx="'+c.x.toFixed(1)+'" cy="'+c.y.toFixed(1)+'" r="'+(big?6:3.6)+'" fill="'+s.color+'" stroke="#fff" stroke-width="'+(big?2.2:1.4)+'"/>';
+        });
+        var last=coords[coords.length-1];
+        if(last&&coords.length>=2){
+          g+='<text x="'+last.x.toFixed(1)+'" y="'+(last.y-11).toFixed(1)+'" text-anchor="end" font-size="11.5" font-weight="700" fill="'+s.color+'">'+fmt(last.v)+'</text>';
+        }
+      });
+      g+='<g id="'+cfg.svgId+'Guide" style="display:none">'+
+         '<line id="'+cfg.svgId+'Line" y1="'+P.t+'" y2="'+(H-P.b)+'" stroke="#15181d" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.45"/>'+
+         '<circle id="'+cfg.svgId+'Dot" r="5.5" fill="#fff" stroke="#15181d" stroke-width="2.2"/>'+
+         '</g>';
+      svg.innerHTML=g;
+      svg.style.touchAction='pan-y';
+      if(sel!==null) show(sel,true);
+    }
+
+    function nearest(clientX){
+      if(!pts.length)return null;
+      var r=svg.getBoundingClientRect();
+      var vx=(clientX-r.left)/r.width*W;
+      var best=pts[0],bd=Infinity;
+      pts.forEach(function(p){var d=Math.abs(p.x-vx);if(d<bd){bd=d;best=p;}});
+      return best;
+    }
+
+    function show(clientX){
+      var q=nearest(clientX); if(!q)return;
+      sel=q;
+      var gl=document.getElementById(cfg.svgId+'Line');
+      var dot=document.getElementById(cfg.svgId+'Dot');
+      var grp=document.getElementById(cfg.svgId+'Guide');
+      if(gl&&dot&&grp){
+        grp.style.display='';
+        gl.setAttribute('x1',q.x);gl.setAttribute('x2',q.x);
+        dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y);
+        dot.setAttribute('stroke',q.s.color);
+      }
+      var n=(q.s.notes&&q.s.notes[q.d])||{};
+      if(!tip)return;
+      tip.hidden=false;
+      tip.innerHTML='<div class="t-d">'+esc(q.d)+(n.period_label?' · '+esc(n.period_label):'')+'</div>'+
+        '<div class="t-v">'+fmt(q.v)+'<span>'+esc(n.publisher||q.s.name)+'</span></div>'+
+        (n.note?'<div class="t-c">'+esc(n.note)+'</div>':'');
+      var r=svg.getBoundingClientRect();
+      var px=q.x/W*r.width, py=q.y/H*r.height;
+      var tw=tip.offsetWidth||150, th=tip.offsetHeight||60;
+      px=Math.max(tw/2+2,Math.min(r.width-tw/2-2,px));
+      tip.style.left=px+'px';
+      tip.style.top=Math.max(py,th+6)+'px';
+    }
+
+    function hide(){
+      var grp=document.getElementById(cfg.svgId+'Guide');
+      if(grp)grp.style.display='none';
+      if(tip)tip.hidden=true;
+    }
+
+    var down=false;
+    box.addEventListener('pointerdown',function(e){down=true;try{box.setPointerCapture&&box.setPointerCapture(e.pointerId);}catch(_){ }show(e.clientX);});
+    box.addEventListener('pointermove',function(e){if(e.pointerType==='touch'&&!down)return;show(e.clientX);});
+    box.addEventListener('pointerup',function(){down=false;});
+    box.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')hide();});
+    document.addEventListener('pointerdown',function(e){if(!box.contains(e.target))hide();});
+
+    function renderLegend(){
+      if(!legend)return;
+      legend.innerHTML='';
+      all.forEach(function(s){
+        var b=document.createElement('button');
+        b.type='button';
+        b.className=vis[s.id]?'':'off';
+        b.style.color=s.color;
+        b.innerHTML='<span class="sw"></span>'+esc(s.name)+' <span class="cnt">'+s.points.length+'点</span>';
+        b.addEventListener('click',function(){vis[s.id]=!vis[s.id];sel=null;renderLegend();draw();});
+        legend.appendChild(b);
+      });
+    }
+
+    var tabs=sect?sect.querySelectorAll('.range-tabs button'):[];
+    Array.prototype.forEach.call(tabs,function(b){
+      b.addEventListener('click',function(){
+        span=Number(b.dataset.d)||0;
+        Array.prototype.forEach.call(tabs,function(x){x.classList.toggle('on',x===b);});
+        sel=null;hide();draw();
+      });
+    });
+
+    renderLegend();
+    draw();
+  }
+  window.__initMultiChart=init;
 })();
 """
 
@@ -988,10 +1306,10 @@ ul.tight li:last-child{margin-bottom:0}
 .range-hint{font-size:12px;color:var(--dim)}
 .chart-box{position:relative;margin:2px 0 6px;touch-action:pan-y}
 #spotChart{display:block;width:100%;height:300px;overflow:visible}
-.chart-tip{position:absolute;pointer-events:none;z-index:5;min-width:132px;
+.chart-tip{position:absolute;pointer-events:none;z-index:5;min-width:132px;max-width:min(320px,80vw);
   background:rgba(21,24,29,.94);color:#fff;border-radius:9px;padding:8px 11px;
   font-size:12.5px;line-height:1.55;box-shadow:0 6px 18px rgba(0,0,0,.22);
-  transform:translate(-50%,-108%);white-space:nowrap}
+  transform:translate(-50%,-108%);white-space:normal;overflow-wrap:anywhere}
 .chart-tip .t-d{color:#c9d1d9;font-size:11.5px;font-variant-numeric:tabular-nums}
 .chart-tip .t-v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .chart-tip .t-v span{font-size:11.5px;font-weight:500;color:#c9d1d9;margin-left:3px}
@@ -1006,6 +1324,7 @@ ul.tight li:last-child{margin-bottom:0}
 .chart-src{font-size:11.5px;color:var(--dim);margin:8px 0 0;line-height:1.6}
 @media(max-width:820px){
   #spotChart{height:230px}
+  #frozenChart,#ratioChart{height:250px}
   .range-hint{display:none}
   .range-tabs{width:100%;justify-content:space-between}
   .range-tabs button{flex:1;padding:8px 6px;font-size:12.5px}
@@ -1023,6 +1342,31 @@ ul.tight li:last-child{margin-bottom:0}
 .mkt-state.warn{background:#fff6f5;border-color:#f3c9c3;color:#9b2c20}
 .subbox.conflict{background:#fff6f5;border-color:#f3c9c3}
 .subbox.conflict h4{color:#9b2c20}
+/* 折叠区：点击标题向下展开，避免长段落平铺 */
+details.fold{margin:12px 0 0;border:1px solid var(--line);border-radius:10px;background:#fafbfc;overflow:hidden}
+details.fold>summary{cursor:pointer;list-style:none;padding:11px 14px;font-size:13.5px;font-weight:650;
+  color:var(--ink);display:flex;align-items:center;gap:8px;user-select:none}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"展开";margin-left:auto;font-size:11.5px;font-weight:600;
+  color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:1px 8px;background:#fff;
+  white-space:nowrap;flex:0 0 auto}
+details.fold[open]>summary::after{content:"收起"}
+details.fold>summary:hover{background:#f3f5f8}
+details.fold>.fold-body{padding:0 14px 13px;border-top:1px solid var(--line2)}
+details.fold>.fold-body>ul.tight{margin-top:11px}
+details.fold.conflict{background:#fff6f5;border-color:#f3c9c3}
+details.fold.conflict>summary{color:#9b2c20}
+details.fold.conflict>summary::after{border-color:#f3c9c3;color:#9b2c20}
+details.fold.gap{background:#f7f9fb}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px}
+.chart-legend button{display:inline-flex;align-items:center;gap:7px;appearance:none;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:600;color:var(--ink2);background:#fff;
+  border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+.chart-legend button .sw{width:16px;height:3px;border-radius:2px;background:currentColor}
+.chart-legend button.off{opacity:.38;filter:grayscale(1)}
+.chart-legend button .cnt{color:var(--dim);font-weight:500}
+#frozenChart,#ratioChart{display:block;width:100%;height:320px;overflow:visible}
+.chart-note{font-size:11.5px;color:var(--dim);margin:6px 0 0;line-height:1.65}
 .gauge{margin:16px 0 4px}
 .ratio-bar{margin:16px 0 4px}
 .gauge-track,.ratio-track{position:relative;height:26px;background:#eceff2;border-radius:7px;overflow:hidden}
@@ -1295,6 +1639,14 @@ def build_dashboard(snapshot):
 <script id="board-data" type="application/json">{payload}</script>
 <script>{SW_REG_JS}</script>
 <script>{SPOT_JS}</script>
+<script>{MULTI_CHART_JS}</script>
+<script>
+(function(){{
+  if(!window.__initMultiChart) return;
+  window.__initMultiChart({{dataId:'frozenData',svgId:'frozenChart',tipId:'frozenTip',legendId:'frozenLegend',defaultSpan:365}});
+  window.__initMultiChart({{dataId:'ratioData',svgId:'ratioChart',tipId:'ratioTip',legendId:'ratioLegend',defaultSpan:180}});
+}})();
+</script>
 <script>
 (function(){{
   var el = document.getElementById('last-check');

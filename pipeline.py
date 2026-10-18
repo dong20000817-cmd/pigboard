@@ -8,6 +8,7 @@
 """
 
 import argparse
+import os
 import sys
 
 import store
@@ -261,6 +262,7 @@ def build_frozen_inventory():
             "definition": reg["definition"],
             "warning": reg["warning"],
             "series": reg["series"],
+            "history": reg.get("history", []),
             "conflicts": reg.get("conflicts", []),
             "known_gaps": reg.get("known_gaps", []),
         },
@@ -305,6 +307,7 @@ def build_cull_sow_ratio():
             "formula": reg["formula"],
             "interpretation": reg["interpretation"],
             "points": pts,
+            "trend": reg.get("trend", []),
             "reference_points": reg.get("reference_points", []),
             "supporting": reg.get("supporting", []),
             "disclaimer": reg["disclaimer"],
@@ -536,32 +539,44 @@ def record_history(snapshot):
 
     if _has_data(mods.get("frozen_inventory")):
         stats = []
-        for s in mods["frozen_inventory"]["detail"].get("series", []):
-            rows = [s["latest"]] + list(s.get("points", []))
-            for p in rows:
-                stats.append(
-                    store.append_history(
-                        "frozen_inventory.csv",
-                        ["series_id", "stat_date"],
-                        {
-                            "series_id": s["id"],
-                            "publisher": s["publisher"],
-                            "sample": s["sample"],
-                            "period_label": p.get("period_label"),
-                            "stat_date": p["stat_date"],
-                            "value": p["value"],
-                            "unit": "%",
-                            "publish_date": p["publish_date"],
-                            "source_url": p["source_url"],
-                        },
-                        ["value"],
-                    )
+        meta = {s["id"]: s for s in mods["frozen_inventory"]["detail"].get("series", [])}
+        hist = mods["frozen_inventory"]["detail"].get("history") or []
+        if not hist:
+            hist = [dict(p, publisher_id=s["id"]) for s in meta.values()
+                    for p in [s["latest"]] + list(s.get("points", []))]
+        for p in hist:
+            sid = p.get("publisher_id")
+            sm = meta.get(sid, {})
+            stats.append(
+                store.append_history(
+                    "frozen_inventory.csv",
+                    ["series_id", "stat_date"],
+                    {
+                        "series_id": sid,
+                        "publisher": p.get("publisher") or sm.get("publisher"),
+                        "sample": sm.get("sample"),
+                        "period_label": p.get("period_label"),
+                        "stat_date": p["stat_date"],
+                        "value": p["value"],
+                        "unit": "%",
+                        "publish_date": p["publish_date"],
+                        "source_url": p["source_url"],
+                    },
+                    ["value"],
                 )
+            )
         results["frozen_inventory"] = "inserted" if "inserted" in stats else ("revised" if "revised" in stats else "unchanged")
 
     if _has_data(mods.get("cull_sow_ratio")):
         stats = []
-        for p in mods["cull_sow_ratio"]["detail"].get("points", []):
+        cull_rows, seen_cull = [], set()
+        for p in (mods["cull_sow_ratio"]["detail"].get("points", [])
+                  + mods["cull_sow_ratio"]["detail"].get("trend", [])):
+            if p["stat_date"] in seen_cull:
+                continue
+            seen_cull.add(p["stat_date"])
+            cull_rows.append(p)
+        for p in cull_rows:
             stats.append(
                 store.append_history(
                     "cull_sow_ratio.csv",
@@ -590,6 +605,20 @@ def record_history(snapshot):
 # 主流程
 # ---------------------------------------------------------------------------
 
+def _start_watchdog(seconds):
+    """硬超时：SSL 握手可能无视 socket 超时，用守护线程强制退出，避免定时任务永久挂起。"""
+    import threading
+    import time
+
+    def _kill():
+        time.sleep(seconds)
+        sys.stderr.write(f"[FATAL] 采集超过 {seconds}s，强制退出（看板保持上一期）\n")
+        sys.stderr.flush()
+        os._exit(2)
+
+    threading.Thread(target=_kill, daemon=True).start()
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true", help="强制重建看板（不写 changelog）")
@@ -597,7 +626,27 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     store.ensure_dirs()
+    try:
+        _start_watchdog(int(os.environ.get("PIGBOARD_MAX_SECONDS", "300")))
+    except ValueError:
+        _start_watchdog(300)
     started = store.now_cst()
+
+    # 公开渠道自动扫描：冻品库容率 / 淘汰母猪月度均价。
+    # 只在发现「新点位」时改写登记库；失败静默降级，绝不阻断主流程。
+    auto_info = None
+    if os.environ.get("PIGBOARD_NO_AUTO") == "1":
+        auto_info = {"ok": True, "skipped": True}
+    else:
+        try:
+            from collectors import thirdparty_auto
+            auto_info = thirdparty_auto.run()
+            added = auto_info.get("frozen_added", 0) + auto_info.get("cull_added", 0)
+            if added and not args.quiet:
+                print(f"  公开渠道自动补充点位：冻品 +{auto_info.get('frozen_added', 0)} / 比价 +{auto_info.get('cull_added', 0)}")
+        except Exception as e:  # noqa: BLE001
+            auto_info = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+
     previous = store.load_snapshot() or {"modules": {}}
     prev_mods = previous.get("modules", {})
 
@@ -683,6 +732,7 @@ def main(argv=None):
                 "last_data_change": previous.get("generated_at"),
                 "snapshot_generated_at": previous.get("generated_at"),
                 "source_errors": errors,
+                "auto_update": auto_info,
                 "history": hist,
                 "checked_modules": list(modules.keys()),
                 "schedule": "07:45 / 09:30 / 12:30 / 15:30 / 17:30 / 21:30",

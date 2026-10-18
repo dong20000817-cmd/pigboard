@@ -30,7 +30,7 @@
         {
           "period_label": "截至2026-10-02当周",
           "stat_date": "2026-10-02",
-          "value": 32.20,
+          "value": 32.2,
           "yoy_pp": 14.55,
           "publish_date": "2026-10-05",
           "source_title": "机构周报引用钢联数据",
@@ -81,7 +81,7 @@
         {
           "period_label": "2026年2月底",
           "stat_date": "2026-02-28",
-          "value": 19.70,
+          "value": 19.7,
           "publish_date": "2026-04-24",
           "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
           "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
@@ -119,5 +119,139 @@
   "pending": [
     "钢联冻品库容率下一期（截至 2026-10-16 当周，约 2026-10-19 发布）。",
     "向机构索取或购买样本口径说明，以解决 conflicts 中的第一项。"
-  ]
+  ],
+  "history": [
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2025-10-25",
+      "period_label": "2025年10月下旬",
+      "value": 21.75,
+      "publish_date": "2026-04-24",
+      "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减（新华财经刊发卓创数据）",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+      "note": "本轮下降起点。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-01-01",
+      "period_label": "2026年1月初",
+      "value": 21.38,
+      "publish_date": "2026-07-21",
+      "source_title": "猪肉冻品库容持续攀升 或掣肘下半年价格涨幅（卓创资讯）",
+      "source_url": "https://finance.sina.com.cn/wm/2026-07-20/doc-iniimzhh4957396.shtml",
+      "note": "由卓创原文「截至7月9日28.29%，较1月初增加6.91个百分点」反推：28.29-6.91=21.38。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-02-28",
+      "period_label": "2026年2月底",
+      "value": 19.7,
+      "publish_date": "2026-04-24",
+      "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+      "note": "2025年10月下旬起由21.75%降至19.70%。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-03-31",
+      "period_label": "2026年3月底",
+      "value": 21.88,
+      "publish_date": "2026-04-24",
+      "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+      "note": "3月主动+被动入库，较2月底+2.18pp。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-06-30",
+      "period_label": "截至2026年6月末",
+      "value": 26.77,
+      "publish_date": "2026-06-24",
+      "source_title": "冻品库容大反弹！节后猪价暴跌、屠企疯狂抄底，26.77%库存是「托底神器」还是「纸糊防线」？",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260624/644433.html",
+      "note": "原文「较年初低位拉升5.39个百分点」，与1月初21.38%衔接。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-07-09",
+      "period_label": "截至2026年7月9日",
+      "value": 28.29,
+      "publish_date": "2026-07-21",
+      "source_title": "猪肉冻品库容持续攀升 或掣肘下半年价格涨幅（卓创资讯）",
+      "source_url": "https://finance.sina.com.cn/wm/2026-07-20/doc-iniimzhh4957396.shtml",
+      "note": "卓创原文；较1月初+6.91pp。"
+    },
+    {
+      "publisher_id": "mysteel-key-slaughter",
+      "publisher": "上海钢联 Mysteel（钢联数据）",
+      "stat_date": "2026-07-31",
+      "period_label": "2026-07-31",
+      "value": 33.01,
+      "publish_date": "2026-08-04",
+      "source_title": "机构周报引用钢联数据",
+      "source_url": "https://m.cngold.org/futures/xw10784547.html",
+      "note": "7月末阶段高点。"
+    },
+    {
+      "publisher_id": "sci-sample-slaughter",
+      "publisher": "卓创资讯 SCI",
+      "stat_date": "2026-08-31",
+      "period_label": "2026年8月平均",
+      "value": 27.63,
+      "publish_date": "2026-09-04",
+      "source_title": "能繁母猪降至3780万头，冻品库容率27.63%，9月猪价重心上移至11.5元区间",
+      "source_url": "https://hangqing.zhuwang.com.cn/hangqingfenxi/20260904/650940.html",
+      "note": "媒体转述，原文未明示机构；数值与卓创7月28.29%及其「下半年缓降」判断衔接，暂归卓创序列并标注中等置信度。",
+      "confidence": "medium"
+    },
+    {
+      "publisher_id": "mysteel-key-slaughter",
+      "publisher": "上海钢联 Mysteel（钢联数据）",
+      "stat_date": "2026-09-18",
+      "period_label": "2026年第34周（9月中旬）",
+      "value": 32.56,
+      "publish_date": "2026-09-24",
+      "source_title": "猪价连涨4周却依旧亏钱！旺季不旺真相找到了？",
+      "source_url": "https://www.hnxmsyzz.com/quote/show-8321.html",
+      "note": "对应冻猪肉库存约31.7万吨。"
+    },
+    {
+      "publisher_id": "mysteel-key-slaughter",
+      "publisher": "上海钢联 Mysteel（钢联数据）",
+      "stat_date": "2026-10-02",
+      "period_label": "截至2026-10-02当周",
+      "value": 32.2,
+      "publish_date": "2026-10-05",
+      "source_title": "机构周报引用钢联数据",
+      "source_url": "https://m.cngold.org/futures/xw10784547.html",
+      "note": "前一周值。"
+    },
+    {
+      "publisher_id": "mysteel-key-slaughter",
+      "publisher": "上海钢联 Mysteel（钢联数据）",
+      "stat_date": "2026-10-09",
+      "period_label": "截至2026-10-09当周",
+      "value": 32.14,
+      "publish_date": "2026-10-12",
+      "source_title": "华泰期货 / 国新国证期货 生猪周报（均明示引用钢联数据）",
+      "source_url": "https://finance.sina.cn/futuremarket/qsyw/2026-10-12/detail-iniuxrzp7170876.d.html",
+      "note": "环比持平，同比+14.39pp。"
+    }
+  ],
+  "auto_update": {
+    "enabled": true,
+    "sources": [
+      "中国养猪网 行业点评/行情分析 列表",
+      "猪好多网 点评 列表",
+      "卓创资讯/钢联 公开转述"
+    ],
+    "last_scan": null,
+    "note": "公开渠道自动扫描；仅接受文中明示机构且非预测值的点位，逐点保留出处。"
+  }
 }

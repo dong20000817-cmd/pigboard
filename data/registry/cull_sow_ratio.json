@@ -65,7 +65,7 @@
   "reference_points": [
     {
       "stat_date": "2026-10-14",
-      "cull_sow_price": 6.30,
+      "cull_sow_price": 6.3,
       "commercial_hog_price": 9.98,
       "ratio_pct": 63.1,
       "publisher": "搜猪网",
@@ -101,7 +101,70 @@
     }
   ],
   "pending": [
-    "淘汰母猪价格为周度披露，下一期（约10月9日/10月16日）发布后需更新并重算比值。",
-    "Mysteel 全国口径「淘汰母猪均价」当日原始发布页未找到，全国均价目前仅见于券商转述。"
-  ]
+    "卓创10月淘汰母猪月均价（通常11月初发布），发布后自动补入趋势序列。",
+    "钢联全国口径「淘汰母猪均价」当日原始发布页未找到，全国均价目前仅见于券商转述。"
+  ],
+  "trend": [
+    {
+      "stat_date": "2026-06-30",
+      "period_label": "2026年6月（第三周）",
+      "cull_sow_price": 7.2,
+      "commercial_hog_price": 9.596,
+      "commercial_hog_price_date": "2026-06-30",
+      "ratio_pct": 75.03,
+      "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+      "publish_date": "2026-06-25",
+      "source_title": "淘汰母猪价格持续走低！短期还要再跌？",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260625/644549.html",
+      "note": "分子为卓创「6月第三周多胎淘汰母猪全国均价7.20元/公斤」；分母为2026年6月全国外三元月均价9.596元/公斤（本看板按日线计算）。"
+    },
+    {
+      "stat_date": "2026-07-31",
+      "period_label": "2026年7月",
+      "cull_sow_price": 7.18,
+      "commercial_hog_price": 10.863,
+      "commercial_hog_price_date": "2026-07-31",
+      "ratio_pct": 66.1,
+      "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+      "publish_date": "2026-08-31",
+      "source_title": "8月份淘汰母猪价格同环比均下滑，市场加速淘汰母猪？",
+      "source_url": "https://www.yangzhu360.com/dianping/20260831/906243.html",
+      "note": "卓创8月均价7.01、环比-2.39%，反推7月均价7.18元/公斤；分母为2026年7月外三元月均价10.863。"
+    },
+    {
+      "stat_date": "2026-08-31",
+      "period_label": "2026年8月",
+      "cull_sow_price": 7.01,
+      "commercial_hog_price": 10.807,
+      "commercial_hog_price_date": "2026-08-31",
+      "ratio_pct": 64.87,
+      "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+      "publish_date": "2026-08-31",
+      "source_title": "8月份淘汰母猪价格同环比均下滑，市场加速淘汰母猪？",
+      "source_url": "https://www.yangzhu360.com/dianping/20260831/906243.html",
+      "note": "卓创原文：8月淘汰母猪月度出栏均价7.01元/公斤，环比-2.39%，同比-31.13%；8月28日6.66元/公斤。"
+    },
+    {
+      "stat_date": "2026-09-30",
+      "period_label": "2026年9月（截至中旬）",
+      "cull_sow_price": 7.07,
+      "commercial_hog_price": 10.755,
+      "commercial_hog_price_date": "2026-09-30",
+      "ratio_pct": 65.74,
+      "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+      "publish_date": "2026-09-24",
+      "source_title": "猪价回落淘母却反弹，背后逻辑藏不住了",
+      "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260924/652695.html",
+      "note": "卓创原文：9月截至中旬淘汰母猪均价7.07元/公斤，环比-0.81%；月内低点9月4日6.51、高点9月18日7.51。"
+    }
+  ],
+  "auto_update": {
+    "enabled": true,
+    "sources": [
+      "卓创资讯月度淘汰母猪均价（中国养猪网/猪好多网公开转载）",
+      "中国养猪网全国外三元日线（月度均价）"
+    ],
+    "last_scan": null,
+    "note": "月度比值由本看板计算：卓创淘汰母猪月均价 ÷ 同期全国外三元月均价。主口径钢联点仍单独展示，不并入本序列。"
+  }
 }

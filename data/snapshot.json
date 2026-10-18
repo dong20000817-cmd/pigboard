@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-18T09:32:37+08:00",
+  "generated_at": "2026-10-18T21:21:52+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -1588,7 +1588,7 @@
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
       "value_hash": "be172a94129f4b88",
-      "hash_changed": true
+      "hash_changed": false
     },
     "dce_futures": {
       "id": "dce_futures",
@@ -1785,28 +1785,6 @@
             "note": "相当于当时正常保有量的104.6%。"
           },
           {
-            "id": "moa-auto-2025-03-31",
-            "period_label": "2025年1季度末",
-            "stat_date": "2025-03-31",
-            "value": 4039,
-            "value_raw": "4039（相当于正常保有量的103.6%，产能正常，处于绿色区域）",
-            "yoy_pct": 1.2,
-            "yoy_abs": null,
-            "mom_pct_official": -1.0,
-            "mom_abs": null,
-            "mom_pct_computed": null,
-            "pct_of_benchmark": 103.6,
-            "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
-            "publish_date": "2025-04-25",
-            "source_title": "生猪产品数据（2025年3月）",
-            "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/",
-            "source_file": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/202504/P020250425570366125575.xlsx",
-            "kind": "official",
-            "confidence": "high",
-            "auto": true,
-            "note": "由官方《生猪产品数据》XLSX 自动抓取并解析；发布日期取自官方文件名日期段。"
-          },
-          {
             "id": "derived-2025Q2",
             "period_label": "2025年二季度末",
             "stat_date": "2025-06-30",
@@ -1985,14 +1963,12 @@
             "note": "2026年3月会前流传版本。"
           }
         ],
-        "auto_note": [
-          "官方自动源新增 1 个季度观测"
-        ],
+        "auto_note": [],
         "conflicts": [],
         "official_index": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/"
       },
       "notes": "官方数据仅在发布日更新，非发布日不得改动看板该模块。",
-      "value_hash": "aea9c91bcbd633c7",
+      "value_hash": "fbf3d02e07a75b78",
       "hash_changed": false
     },
     "frozen_inventory": {
@@ -2127,6 +2103,130 @@
             "disclaimer": "第三方样本口径，仅代表样本屠宰企业情况，不代表全国冻品库存水平。"
           }
         ],
+        "history": [
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2025-10-25",
+            "period_label": "2025年10月下旬",
+            "value": 21.75,
+            "publish_date": "2026-04-24",
+            "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减（新华财经刊发卓创数据）",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+            "note": "本轮下降起点。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-01-01",
+            "period_label": "2026年1月初",
+            "value": 21.38,
+            "publish_date": "2026-07-21",
+            "source_title": "猪肉冻品库容持续攀升 或掣肘下半年价格涨幅（卓创资讯）",
+            "source_url": "https://finance.sina.com.cn/wm/2026-07-20/doc-iniimzhh4957396.shtml",
+            "note": "由卓创原文「截至7月9日28.29%，较1月初增加6.91个百分点」反推：28.29-6.91=21.38。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-02-28",
+            "period_label": "2026年2月底",
+            "value": 19.7,
+            "publish_date": "2026-04-24",
+            "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+            "note": "2025年10月下旬起由21.75%降至19.70%。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-03-31",
+            "period_label": "2026年3月底",
+            "value": 21.88,
+            "publish_date": "2026-04-24",
+            "source_title": "预计2026年二至四季度屠宰企业猪肉冻品库容率或先增后减",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260424/638994.html",
+            "note": "3月主动+被动入库，较2月底+2.18pp。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-06-30",
+            "period_label": "截至2026年6月末",
+            "value": 26.77,
+            "publish_date": "2026-06-24",
+            "source_title": "冻品库容大反弹！节后猪价暴跌、屠企疯狂抄底，26.77%库存是「托底神器」还是「纸糊防线」？",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260624/644433.html",
+            "note": "原文「较年初低位拉升5.39个百分点」，与1月初21.38%衔接。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-07-09",
+            "period_label": "截至2026年7月9日",
+            "value": 28.29,
+            "publish_date": "2026-07-21",
+            "source_title": "猪肉冻品库容持续攀升 或掣肘下半年价格涨幅（卓创资讯）",
+            "source_url": "https://finance.sina.com.cn/wm/2026-07-20/doc-iniimzhh4957396.shtml",
+            "note": "卓创原文；较1月初+6.91pp。"
+          },
+          {
+            "publisher_id": "mysteel-key-slaughter",
+            "publisher": "上海钢联 Mysteel（钢联数据）",
+            "stat_date": "2026-07-31",
+            "period_label": "2026-07-31",
+            "value": 33.01,
+            "publish_date": "2026-08-04",
+            "source_title": "机构周报引用钢联数据",
+            "source_url": "https://m.cngold.org/futures/xw10784547.html",
+            "note": "7月末阶段高点。"
+          },
+          {
+            "publisher_id": "sci-sample-slaughter",
+            "publisher": "卓创资讯 SCI",
+            "stat_date": "2026-08-31",
+            "period_label": "2026年8月平均",
+            "value": 27.63,
+            "publish_date": "2026-09-04",
+            "source_title": "能繁母猪降至3780万头，冻品库容率27.63%，9月猪价重心上移至11.5元区间",
+            "source_url": "https://hangqing.zhuwang.com.cn/hangqingfenxi/20260904/650940.html",
+            "note": "媒体转述，原文未明示机构；数值与卓创7月28.29%及其「下半年缓降」判断衔接，暂归卓创序列并标注中等置信度。",
+            "confidence": "medium"
+          },
+          {
+            "publisher_id": "mysteel-key-slaughter",
+            "publisher": "上海钢联 Mysteel（钢联数据）",
+            "stat_date": "2026-09-18",
+            "period_label": "2026年第34周（9月中旬）",
+            "value": 32.56,
+            "publish_date": "2026-09-24",
+            "source_title": "猪价连涨4周却依旧亏钱！旺季不旺真相找到了？",
+            "source_url": "https://www.hnxmsyzz.com/quote/show-8321.html",
+            "note": "对应冻猪肉库存约31.7万吨。"
+          },
+          {
+            "publisher_id": "mysteel-key-slaughter",
+            "publisher": "上海钢联 Mysteel（钢联数据）",
+            "stat_date": "2026-10-02",
+            "period_label": "截至2026-10-02当周",
+            "value": 32.2,
+            "publish_date": "2026-10-05",
+            "source_title": "机构周报引用钢联数据",
+            "source_url": "https://m.cngold.org/futures/xw10784547.html",
+            "note": "前一周值。"
+          },
+          {
+            "publisher_id": "mysteel-key-slaughter",
+            "publisher": "上海钢联 Mysteel（钢联数据）",
+            "stat_date": "2026-10-09",
+            "period_label": "截至2026-10-09当周",
+            "value": 32.14,
+            "publish_date": "2026-10-12",
+            "source_title": "华泰期货 / 国新国证期货 生猪周报（均明示引用钢联数据）",
+            "source_url": "https://finance.sina.cn/futuremarket/qsyw/2026-10-12/detail-iniuxrzp7170876.d.html",
+            "note": "环比持平，同比+14.39pp。"
+          }
+        ],
         "conflicts": [
           {
             "issue": "Mysteel 自身预测区间与当前引用值不兼容",
@@ -2148,8 +2248,8 @@
       },
       "notes": "该指标不存在官方口径。看板必须与能繁母猪等官方数据分区展示，禁止并列为同一可信度。",
       "disclaimer": "本指标不存在官方口径。以下全部为第三方样本口径；不同机构的样本池不同，数值水平差异可达 10 个百分点以上，严禁互相拼接或跨机构比较。",
-      "value_hash": "198a64da6e2222c7",
-      "hash_changed": false
+      "value_hash": "8d10486db4a4d477",
+      "hash_changed": true
     },
     "cull_sow_ratio": {
       "id": "cull_sow_ratio",
@@ -2211,6 +2311,60 @@
             "confidence": "high",
             "note": "原文：截至10月2日，钢联样本企业淘汰母猪均价6.84元/kg，周环比下跌3.25%，淘汰母猪与商品猪价格比值0.67。截至10月7日，商品猪出栏均价10.26元/kg，周环比上涨2.09%。",
             "cross_check": "6.84 ÷ 10.26 = 66.7%，与研报披露的 0.67 一致。"
+          }
+        ],
+        "trend": [
+          {
+            "stat_date": "2026-06-30",
+            "period_label": "2026年6月（第三周）",
+            "cull_sow_price": 7.2,
+            "commercial_hog_price": 9.596,
+            "commercial_hog_price_date": "2026-06-30",
+            "ratio_pct": 75.03,
+            "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+            "publish_date": "2026-06-25",
+            "source_title": "淘汰母猪价格持续走低！短期还要再跌？",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260625/644549.html",
+            "note": "分子为卓创「6月第三周多胎淘汰母猪全国均价7.20元/公斤」；分母为2026年6月全国外三元月均价9.596元/公斤（本看板按日线计算）。"
+          },
+          {
+            "stat_date": "2026-07-31",
+            "period_label": "2026年7月",
+            "cull_sow_price": 7.18,
+            "commercial_hog_price": 10.863,
+            "commercial_hog_price_date": "2026-07-31",
+            "ratio_pct": 66.1,
+            "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+            "publish_date": "2026-08-31",
+            "source_title": "8月份淘汰母猪价格同环比均下滑，市场加速淘汰母猪？",
+            "source_url": "https://www.yangzhu360.com/dianping/20260831/906243.html",
+            "note": "卓创8月均价7.01、环比-2.39%，反推7月均价7.18元/公斤；分母为2026年7月外三元月均价10.863。"
+          },
+          {
+            "stat_date": "2026-08-31",
+            "period_label": "2026年8月",
+            "cull_sow_price": 7.01,
+            "commercial_hog_price": 10.807,
+            "commercial_hog_price_date": "2026-08-31",
+            "ratio_pct": 64.87,
+            "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+            "publish_date": "2026-08-31",
+            "source_title": "8月份淘汰母猪价格同环比均下滑，市场加速淘汰母猪？",
+            "source_url": "https://www.yangzhu360.com/dianping/20260831/906243.html",
+            "note": "卓创原文：8月淘汰母猪月度出栏均价7.01元/公斤，环比-2.39%，同比-31.13%；8月28日6.66元/公斤。"
+          },
+          {
+            "stat_date": "2026-09-30",
+            "period_label": "2026年9月（截至中旬）",
+            "cull_sow_price": 7.07,
+            "commercial_hog_price": 10.755,
+            "commercial_hog_price_date": "2026-09-30",
+            "ratio_pct": 65.74,
+            "publisher": "卓创资讯（淘汰母猪）/ 中国养猪网（商品猪，月度均价）",
+            "publish_date": "2026-09-24",
+            "source_title": "猪价回落淘母却反弹，背后逻辑藏不住了",
+            "source_url": "https://news.zhuwang.com.cn/xingyedianping/20260924/652695.html",
+            "note": "卓创原文：9月截至中旬淘汰母猪均价7.07元/公斤，环比-0.81%；月内低点9月4日6.51、高点9月18日7.51。"
           }
         ],
         "reference_points": [
@@ -2286,8 +2440,8 @@
         "disclaimer": "本比值为本看板依据第三方样本价格自行计算，非任何机构原发布值；分子为第三方样本口径，分母为全国综合均价，两者样本范围不完全一致。"
       },
       "notes": "解读：比值越低，说明淘汰母猪卖不上价、市场淘汰压力越大。经验区间约 45%~75%，低于 50% 通常对应深度亏损与加速去产能。本比值由本看板自行计算，非任何机构原发布值。",
-      "value_hash": "b1b4f1fea3485190",
-      "hash_changed": false
+      "value_hash": "01b708c148264bcd",
+      "hash_changed": true
     }
   },
   "source_errors": {}

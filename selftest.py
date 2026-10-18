@@ -24,7 +24,8 @@ def sha(path):
 
 
 def run(cwd, expect_rc=0):
-    p = subprocess.run([PY, "pipeline.py"], cwd=cwd, capture_output=True, text=True)
+    env = dict(os.environ, PIGBOARD_NO_AUTO="1")  # 自检不依赖外网扫描，保证可重复
+    p = subprocess.run([PY, "pipeline.py"], cwd=cwd, env=env, capture_output=True, text=True)
     return p.returncode, (p.stdout + p.stderr).strip()
 
 

@@ -65,7 +65,7 @@ def _month_sequence(lookback=14):
 
 
 def _find_xlsx(page_url):
-    status, raw = request(page_url, headers=HEADERS, timeout=30, retries=2)
+    status, raw = request(page_url, headers=HEADERS, timeout=12, retries=1)
     if status != 200:
         return None
     html = raw.decode("utf-8", "replace")
@@ -79,7 +79,7 @@ def _find_xlsx(page_url):
 
 
 def _download(url):
-    status, raw = request(url, headers=HEADERS, timeout=45, retries=2)
+    status, raw = request(url, headers=HEADERS, timeout=30, retries=1)
     if status != 200:
         raise RuntimeError(f"下载失败 HTTP {status}: {url}")
     fd, path = tempfile.mkstemp(suffix=".xlsx")
