@@ -7,3 +7,5 @@ data/cache/
 *.tmp
 docs/看板预览_iPhone全页.png
 data/heartbeat.json
+
+data/.pipeline.lock

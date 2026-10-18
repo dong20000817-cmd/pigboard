@@ -605,6 +605,22 @@ def record_history(snapshot):
 # 主流程
 # ---------------------------------------------------------------------------
 
+def _acquire_lock():
+    """同一时刻只允许一个巡检写数据；launchd 与手动执行重叠时，后来者直接跳过。"""
+    try:
+        import fcntl
+    except ImportError:
+        return True  # 非 POSIX 平台不加锁
+    path = os.path.join(store.DATA, ".pipeline.lock")
+    f = open(path, "w")
+    try:
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        f.close()
+        return None
+    return f
+
+
 def _start_watchdog(seconds):
     """硬超时：SSL 握手可能无视 socket 超时，用守护线程强制退出，避免定时任务永久挂起。"""
     import threading
@@ -626,6 +642,11 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     store.ensure_dirs()
+    lock = _acquire_lock()
+    if lock is None:
+        if not args.quiet:
+            print(f"[{store.iso()}] 另一个巡检正在运行，本次跳过。")
+        return 0
     try:
         _start_watchdog(int(os.environ.get("PIGBOARD_MAX_SECONDS", "300")))
     except ValueError:
