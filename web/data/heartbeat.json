@@ -1,10 +1,8 @@
 {
-  "last_check": "2026-10-22T09:54:07+08:00",
+  "last_check": "2026-10-23T09:58:42+08:00",
   "data_changed": true,
-  "last_data_change": "2026-10-22T09:54:07+08:00",
+  "last_data_change": "2026-10-23T09:58:42+08:00",
   "schedule": "07:45 / 09:30 / 12:30 / 15:30 / 17:30 / 21:30",
   "mode": "cloud",
-  "source_errors": {
-    "hog_spot": "RuntimeError: 请求失败 https://xt.yangzhu.vip/data/getzhujiatoday: <urlopen error timed out>"
-  }
+  "source_errors": {}
 }
