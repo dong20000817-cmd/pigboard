@@ -155,6 +155,53 @@ def _next_releases(points):
     ]
 
 
+def _persist_official_points(reg, official_points):
+    """把官方源自动抓到的季度点写回登记库。
+
+    为什么要落盘：GitHub Actions 的 runner 在境外，经常连不上 moa.gov.cn，
+    只走「运行时合并」会导致云端构建把已经抓到的新季度**倒退**回上一期。
+    写回登记库后，任何环境都能读到这一期；同一台机器上也只是幂等追加。
+    """
+    have = {p["stat_date"] for p in reg["points"]}
+    added = 0
+    for p in official_points:
+        sd = p["stat_date"]
+        if sd in have or p.get("value") is None:
+            continue
+        val = p["value"]
+        if isinstance(val, float) and val.is_integer():
+            val = int(val)
+        reg["points"].append(
+            {
+                "id": f"moa-auto-{sd}",
+                "period_label": p["period_label"],
+                "stat_date": sd,
+                "value": val,
+                "value_raw": p.get("value_raw"),
+                "yoy_pct": p.get("yoy_pct"),
+                "yoy_abs": None,
+                "mom_pct_official": p.get("mom_pct_official"),
+                "mom_abs": None,
+                "mom_pct_computed": None,
+                "pct_of_benchmark": p.get("pct_of_benchmark"),
+                "publisher": p.get("publisher"),
+                "publish_date": p.get("publish_date"),
+                "source_title": p.get("source_title"),
+                "source_url": p.get("source_url"),
+                "kind": "official",
+                "confidence": "high",
+                "auto": True,
+                "note": "由官方《生猪产品数据》XLSX 自动抓取并解析，已写入登记库留档。",
+            }
+        )
+        have.add(sd)
+        added += 1
+    if added:
+        reg["points"].sort(key=lambda x: x["stat_date"])
+        store.write_json(os.path.join(store.REGISTRY, "sow_inventory.json"), reg)
+    return added
+
+
 def build_sow_inventory():
     reg = store.load_registry("sow_inventory")
     points = {p["stat_date"]: dict(p) for p in reg["points"]}
@@ -207,6 +254,10 @@ def build_sow_inventory():
             added += 1
         if added:
             auto_note.append(f"官方自动源新增 {added} 个季度观测")
+            try:
+                _persist_official_points(reg, official.get("points", []))
+            except Exception as e:  # noqa: BLE001 - 落盘失败不影响本次展示
+                auto_note.append(f"⚠ 自动点位写回登记库失败：{type(e).__name__}")
         if conflicts:
             auto_note.append(f"⚠ {len(conflicts)} 个季度官方值与登记值不一致，需人工复核")
     except Exception as e:  # noqa: BLE001 - 官方源失败不应影响已有登记数据

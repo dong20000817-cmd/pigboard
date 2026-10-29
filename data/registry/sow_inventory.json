@@ -62,6 +62,27 @@
       "note": "相当于当时正常保有量的104.6%。"
     },
     {
+      "id": "moa-auto-2025-03-31",
+      "period_label": "2025年1季度末",
+      "stat_date": "2025-03-31",
+      "value": 4039,
+      "value_raw": "4039（相当于正常保有量的103.6%，产能正常，处于绿色区域）",
+      "yoy_pct": 1.2,
+      "yoy_abs": null,
+      "mom_pct_official": -1.0,
+      "mom_abs": null,
+      "mom_pct_computed": null,
+      "pct_of_benchmark": 103.6,
+      "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
+      "publish_date": "2025-04-25",
+      "source_title": "生猪产品数据（2025年3月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/",
+      "kind": "official",
+      "confidence": "high",
+      "auto": true,
+      "note": "由官方《生猪产品数据》XLSX 自动抓取并解析，已写入登记库留档。"
+    },
+    {
       "id": "derived-2025Q2",
       "period_label": "2025年二季度末",
       "stat_date": "2025-06-30",
@@ -156,6 +177,27 @@
       "kind": "official",
       "confidence": "high",
       "note": "官方原表数值栏原文：「3780（相当于调控目标的100.8%）」。同比减少263万头。"
+    },
+    {
+      "id": "moa-auto-2026-09-30",
+      "period_label": "2026年3季度末",
+      "stat_date": "2026-09-30",
+      "value": 3602,
+      "value_raw": "3602（相当于调控目标的96.0%）",
+      "yoy_pct": -10.7,
+      "yoy_abs": null,
+      "mom_pct_official": -4.7,
+      "mom_abs": null,
+      "mom_pct_computed": null,
+      "pct_of_benchmark": 96.0,
+      "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
+      "publish_date": "2026-10-29",
+      "source_title": "生猪产品数据（2026年9月）",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202609/",
+      "kind": "official",
+      "confidence": "high",
+      "auto": true,
+      "note": "由官方《生猪产品数据》XLSX 自动抓取并解析，已写入登记库留档。"
     }
   ],
   "sample_watch": {
