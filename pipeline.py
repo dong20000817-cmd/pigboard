@@ -122,6 +122,39 @@ def build_dce_futures():
     }
 
 
+_QUARTER_END_DAY = {3: (3, 31), 6: (6, 30), 9: (9, 30), 12: (12, 31)}
+
+
+def _quarter_of_month(m):
+    return {1: 3, 2: 3, 3: 3, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9, 9: 9, 10: 12, 11: 12, 12: 12}[m]
+
+
+def _next_releases(points):
+    """按官方发布节奏推算「下一期官方发布」，已入库的期次自然滚过去。
+
+    官方口径：五部委《生猪产品数据》每月 20 日前后发布一期；只有季末月
+    （3/6/9/12 月）才含能繁母猪存栏绝对值，故这里只推下一期季末。
+    """
+    last = points[-1]["stat_date"]
+    y, m = int(last[:4]), int(last[5:7])
+    end_m = _quarter_of_month(m)
+    nq_m, nq_y = end_m + 3, y
+    if nq_m > 12:
+        nq_m, nq_y = nq_m - 12, nq_y + 1
+    end_m, end_d = _QUARTER_END_DAY[nq_m]
+    rel_m, rel_y = end_m + 1, nq_y
+    if rel_m > 12:
+        rel_m, rel_y = rel_m - 12, rel_y + 1
+    return [
+        {
+            "period": f"{nq_y}年{nq_m // 3}季度末",
+            "expected_date": f"{rel_y}-{rel_m:02d}-20",
+            "carrier": f"国家统计局季度发布 + 五部委《生猪产品数据（{nq_y}年{end_m}月）》",
+            "status": "待发布",
+        }
+    ]
+
+
 def build_sow_inventory():
     reg = store.load_registry("sow_inventory")
     points = {p["stat_date"]: dict(p) for p in reg["points"]}
@@ -213,7 +246,7 @@ def build_sow_inventory():
         "detail": {
             "points": pts,
             "benchmark": reg["benchmark"],
-            "release_schedule": reg["release_schedule"],
+            "release_schedule": dict(reg["release_schedule"], next_expected=_next_releases(pts)),
             "publisher_note": reg["publisher_note"],
             "moa_monthly_rule": reg["moa_monthly_rule"],
             "sample_watch": reg.get("sample_watch"),
@@ -814,6 +847,7 @@ def main(argv=None):
             "last_data_change": snapshot["generated_at"],
             "snapshot_generated_at": snapshot["generated_at"],
             "source_errors": errors,
+            "auto_update": auto_info,
             "history": hist,
             "schedule": "07:45 / 09:30 / 12:30 / 15:30 / 17:30 / 21:30",
         }

@@ -258,29 +258,10 @@ def _parse_period_from_xlsx(year, month):
     return f"{year}年{month}月"
 
 
-def fetch_official_series(months_back=20, ttl_hours=12, force=False):
-    """
-    回溯扫描官方各月《生猪产品数据》，抽出全部「季度末能繁母猪存栏」观测。
-    结果带 TTL 缓存，避免每次巡检都重扫 20 个月页。
-
-    返回 {"points": [...], "scanned": n, "cache": "hit|miss", "latest_period": "..."}
-    """
-    import json as _json
-    import time
-
-    if not force and os.path.exists(CACHE_PATH):
-        try:
-            with open(CACHE_PATH, "r", encoding="utf-8") as f:
-                cached = _json.load(f)
-            if time.time() - cached.get("_cached_at", 0) < ttl_hours * 3600:
-                cached["cache"] = "hit"
-                return cached
-        except Exception:
-            pass
-
-    points = []
-    scanned = 0
-    for y, m in _month_sequence(months_back):
+def _scan_months(months):
+    """扫描给定的 (年, 月) 页面，返回 (季度末能繁母猪点位, 成功解析的期数)。"""
+    pts, scanned = [], 0
+    for y, m in months:
         page = f"{BASE}/{y}/{y}{m:02d}/"
         try:
             xlsx = _find_xlsx(page)
@@ -312,7 +293,7 @@ def fetch_official_series(months_back=20, ttl_hours=12, force=False):
             mm = re.search(r"(\d+(?:\.\d+)?)\s*%", str(raw))
             if mm:
                 pct = float(mm.group(1))
-            points.append(
+            pts.append(
                 {
                     "stat_date": stat_date,
                     "period_label": period["label"],
@@ -330,25 +311,69 @@ def fetch_official_series(months_back=20, ttl_hours=12, force=False):
                     "kind": "official",
                 }
             )
+    return pts, scanned
 
-    # 去重（同 stat_date 取扫描到的最先一期）并按日期排序
-    seen, uniq = set(), []
-    for p in sorted(points, key=lambda x: x["stat_date"]):
-        if p["stat_date"] in seen:
-            continue
-        seen.add(p["stat_date"])
-        uniq.append(p)
 
+# 最近 N 个月页**每次巡检都重扫**：新一期《生猪产品数据》一发布就能当天抓到，
+# 不会被历史缓存挡住（历史缓存只用于补齐更早的季度）。
+RECENT_MONTHS = 3
+
+
+def fetch_official_series(months_back=20, ttl_hours=24, force=False):
+    """
+    回溯扫描官方各月《生猪产品数据》，抽出全部「季度末能繁母猪存栏」观测。
+
+    策略：
+      * 最近 RECENT_MONTHS 个月页每次都现场扫（新鲜度来源，约 2~4 秒）；
+      * 更早的历史点位走 TTL 缓存，过期后整段重扫一次（完整性来源）。
+
+    返回 {"points": [...], "scanned": n, "cache": "hit|miss|partial", "latest_period": "..."}
+    """
+    import json as _json
+    import time
+
+    recent = _month_sequence(RECENT_MONTHS)
+    recent_keys = set(recent)
+
+    cached = None
+    if not force and os.path.exists(CACHE_PATH):
+        try:
+            with open(CACHE_PATH, "r", encoding="utf-8") as f:
+                cached = _json.load(f)
+        except Exception:
+            cached = None
+        if cached and time.time() - cached.get("_cached_at", 0) >= ttl_hours * 3600:
+            cached = None  # 历史缓存过期：整段重扫一次
+
+    history, scanned = [], 0
+    if cached is None:
+        older = [(y, m) for y, m in _month_sequence(months_back) if (y, m) not in recent_keys]
+        history, scanned = _scan_months(older)
+
+    fresh, n_recent = _scan_months(recent)
+    scanned += n_recent
+
+    merged = {}
+    base = cached.get("points", []) if cached else history
+    for p in base:
+        merged[p["stat_date"]] = p
+    for p in fresh:
+        merged[p["stat_date"]] = p  # 现场扫到的覆盖缓存
+
+    uniq = [merged[k] for k in sorted(merged)]
     out = {
         "points": uniq,
         "scanned": scanned,
         "latest_period": uniq[-1]["period_label"] if uniq else None,
-        "cache": "miss",
+        "cache": "hit" if cached else ("miss" if not force else "forced"),
         "_cached_at": time.time(),
     }
-    os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
-    with open(CACHE_PATH, "w", encoding="utf-8") as f:
-        _json.dump(out, f, ensure_ascii=False, indent=2)
+    try:
+        os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+        with open(CACHE_PATH, "w", encoding="utf-8") as f:
+            _json.dump(out, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass  # 缓存写不进去不影响本次返回
     return out
 
 

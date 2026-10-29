@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-18T21:30:25+08:00",
+  "generated_at": "2026-10-29T18:49:18+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -20,100 +20,56 @@
       "sample": "全国口径综合报价",
       "freq": "日度（含周末与节假日，无报价日顺延）",
       "source_url": "https://xt.yangzhu.vip/manage/datamap/ptype/1/areano/-1.html",
-      "stat_date": "2026-10-18",
-      "publish_date": "2026-10-18",
+      "stat_date": "2026-10-29",
+      "publish_date": "2026-10-29",
       "stale": false,
       "headline": {
-        "value": 9.87,
-        "prev_value": 9.88,
+        "value": 9.27,
+        "prev_value": 9.33,
         "prev_label": "前一报价日",
-        "change_abs": -0.01,
-        "change_pct": -0.1,
+        "change_abs": -0.06,
+        "change_pct": -0.64,
         "change_unit": "元/公斤",
         "extra_chips": [
           {
             "label": "同比",
-            "value": "-11.80%"
+            "value": "-25.78%"
           },
           {
             "label": "环比",
-            "value": "-8.10%"
+            "value": "-8.85%"
           },
           {
             "label": "元/斤",
-            "value": "4.93"
+            "value": "4.63"
           }
         ]
       },
       "detail": {
         "extras": {
           "内三元": {
-            "value": 10.04,
-            "change": -0.3
+            "value": 9.86,
+            "change": -0.06
           },
           "土杂猪": {
-            "value": 9.78,
-            "change": 0.0
+            "value": 9.33,
+            "change": 0.02
           },
           "玉米": {
-            "value": 2311.0,
-            "change": -10.0,
+            "value": 2340.0,
+            "change": 17.0,
             "unit": "元/吨"
           },
           "豆粕": {
-            "value": 3090.0,
-            "change": -151.0,
+            "value": 3106.0,
+            "change": 6.0,
             "unit": "元/吨"
           },
           "猪粮比": {
-            "value": "4.27"
+            "value": "3.96"
           }
         },
         "series": [
-          [
-            "2025-10-17",
-            11.17
-          ],
-          [
-            "2025-10-18",
-            11.19
-          ],
-          [
-            "2025-10-19",
-            11.17
-          ],
-          [
-            "2025-10-20",
-            11.18
-          ],
-          [
-            "2025-10-21",
-            11.29
-          ],
-          [
-            "2025-10-22",
-            11.49
-          ],
-          [
-            "2025-10-23",
-            11.74
-          ],
-          [
-            "2025-10-24",
-            11.8
-          ],
-          [
-            "2025-10-25",
-            11.83
-          ],
-          [
-            "2025-10-26",
-            11.85
-          ],
-          [
-            "2025-10-27",
-            11.92
-          ],
           [
             "2025-10-28",
             12.2
@@ -1537,57 +1493,101 @@
           [
             "2026-10-18",
             9.87
+          ],
+          [
+            "2026-10-19",
+            9.94
+          ],
+          [
+            "2026-10-20",
+            9.92
+          ],
+          [
+            "2026-10-21",
+            9.86
+          ],
+          [
+            "2026-10-22",
+            9.77
+          ],
+          [
+            "2026-10-23",
+            9.66
+          ],
+          [
+            "2026-10-24",
+            9.53
+          ],
+          [
+            "2026-10-25",
+            9.48
+          ],
+          [
+            "2026-10-26",
+            9.47
+          ],
+          [
+            "2026-10-27",
+            9.43
+          ],
+          [
+            "2026-10-28",
+            9.33
+          ],
+          [
+            "2026-10-29",
+            9.27
           ]
         ],
         "series_range": [
-          "2025-10-17",
-          "2026-10-18"
+          "2025-10-28",
+          "2026-10-29"
         ],
         "windows": {
           "7": {
             "window": 7,
             "available": true,
-            "start_date": "2026-10-11",
-            "start_value": 10.26,
-            "end_date": "2026-10-18",
-            "end_value": 9.87,
-            "change_abs": -0.39,
-            "change_pct": -3.8,
-            "high": 10.17,
-            "low": 9.87,
+            "start_date": "2026-10-22",
+            "start_value": 9.77,
+            "end_date": "2026-10-29",
+            "end_value": 9.27,
+            "change_abs": -0.5,
+            "change_pct": -5.12,
+            "high": 9.66,
+            "low": 9.27,
             "points": 7
           },
           "30": {
             "window": 30,
             "available": true,
-            "start_date": "2026-09-18",
-            "start_value": 10.74,
-            "end_date": "2026-10-18",
-            "end_value": 9.87,
-            "change_abs": -0.87,
-            "change_pct": -8.1,
-            "high": 10.75,
-            "low": 9.87,
+            "start_date": "2026-09-29",
+            "start_value": 10.17,
+            "end_date": "2026-10-29",
+            "end_value": 9.27,
+            "change_abs": -0.9,
+            "change_pct": -8.85,
+            "high": 10.34,
+            "low": 9.27,
             "points": 30
           },
           "90": {
             "window": 90,
             "available": true,
-            "start_date": "2026-07-20",
-            "start_value": 10.94,
-            "end_date": "2026-10-18",
-            "end_value": 9.87,
-            "change_abs": -1.07,
-            "change_pct": -9.78,
+            "start_date": "2026-07-31",
+            "start_value": 10.35,
+            "end_date": "2026-10-29",
+            "end_value": 9.27,
+            "change_abs": -1.08,
+            "change_pct": -10.43,
             "high": 11.28,
-            "low": 9.87,
+            "low": 9.27,
             "points": 90
           }
         },
         "history_error": null
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
-      "value_hash": "be172a94129f4b88",
+      "value_hash": "94763553865de474",
       "hash_changed": false
     },
     "dce_futures": {
@@ -1600,15 +1600,15 @@
       "sample": "6 个活跃合约",
       "freq": "每交易日 15:00 收盘后",
       "source_url": "https://futsseapi.eastmoney.com/list/114",
-      "stat_date": "2026-10-16",
-      "publish_date": "2026-10-16",
+      "stat_date": "2026-10-29",
+      "publish_date": "2026-10-29",
       "stale": false,
       "headline": {
-        "value": 10490.0,
-        "prev_value": 10465.0,
+        "value": 9550.0,
+        "prev_value": 9885.0,
         "prev_label": "主力 LH2701 昨结算",
-        "change_abs": 25.0,
-        "change_pct": 0.24,
+        "change_abs": -335.0,
+        "change_pct": -3.39,
         "change_unit": "元/吨",
         "extra_chips": [
           {
@@ -1617,11 +1617,11 @@
           },
           {
             "label": "涨跌家数",
-            "value": "4涨1跌"
+            "value": "1涨5跌"
           },
           {
             "label": "总持仓",
-            "value": "506,154"
+            "value": "455,611"
           }
         ]
       },
@@ -1630,91 +1630,91 @@
           {
             "code": "LH2611",
             "name": "生猪2611",
-            "close": 10055.0,
-            "prev_settle": 10030.0,
-            "change_abs": 25.0,
-            "change_pct": 0.25,
-            "open": 10040.0,
-            "high": 10200.0,
-            "low": 10000.0,
-            "volume": 56720,
-            "open_interest": 75962,
-            "settle": 10085.0
+            "close": 9005.0,
+            "prev_settle": 9285.0,
+            "change_abs": -280.0,
+            "change_pct": -3.02,
+            "open": 9145.0,
+            "high": 9145.0,
+            "low": 9005.0,
+            "volume": 8831,
+            "open_interest": 9471,
+            "settle": 9065.0
           },
           {
             "code": "LH2701",
             "name": "生猪2701",
-            "close": 10490.0,
-            "prev_settle": 10465.0,
-            "change_abs": 25.0,
-            "change_pct": 0.24,
-            "open": 10450.0,
-            "high": 10615.0,
-            "low": 10325.0,
-            "volume": 174035,
-            "open_interest": 182448,
-            "settle": 10475.0
+            "close": 9550.0,
+            "prev_settle": 9885.0,
+            "change_abs": -335.0,
+            "change_pct": -3.39,
+            "open": 9710.0,
+            "high": 9750.0,
+            "low": 9530.0,
+            "volume": 152402,
+            "open_interest": 161994,
+            "settle": 9630.0
           },
           {
             "code": "LH2703",
             "name": "生猪2703",
-            "close": 10240.0,
-            "prev_settle": 10275.0,
-            "change_abs": -35.0,
-            "change_pct": -0.34,
-            "open": 10280.0,
-            "high": 10365.0,
-            "low": 10130.0,
-            "volume": 42322,
-            "open_interest": 131296,
-            "settle": 10260.0
+            "close": 9350.0,
+            "prev_settle": 9670.0,
+            "change_abs": -320.0,
+            "change_pct": -3.31,
+            "open": 9600.0,
+            "high": 9600.0,
+            "low": 9335.0,
+            "volume": 63278,
+            "open_interest": 145242,
+            "settle": 9405.0
           },
           {
             "code": "LH2705",
             "name": "生猪2705",
-            "close": 11235.0,
-            "prev_settle": 11235.0,
-            "change_abs": 0.0,
-            "change_pct": 0.0,
-            "open": 11215.0,
-            "high": 11370.0,
-            "low": 11060.0,
-            "volume": 16349,
-            "open_interest": 55951,
-            "settle": 11220.0
+            "close": 10420.0,
+            "prev_settle": 10655.0,
+            "change_abs": -235.0,
+            "change_pct": -2.21,
+            "open": 10570.0,
+            "high": 10570.0,
+            "low": 10360.0,
+            "volume": 23275,
+            "open_interest": 60424,
+            "settle": 10430.0
           },
           {
             "code": "LH2707",
             "name": "生猪2707",
-            "close": 12155.0,
-            "prev_settle": 12100.0,
-            "change_abs": 55.0,
-            "change_pct": 0.45,
-            "open": 12045.0,
-            "high": 12285.0,
-            "low": 11930.0,
-            "volume": 14415,
-            "open_interest": 36508,
-            "settle": 12105.0
+            "close": 11640.0,
+            "prev_settle": 11700.0,
+            "change_abs": -60.0,
+            "change_pct": -0.51,
+            "open": 11670.0,
+            "high": 11670.0,
+            "low": 11555.0,
+            "volume": 10993,
+            "open_interest": 41714,
+            "settle": 11610.0
           },
           {
             "code": "LH2709",
             "name": "生猪2709",
-            "close": 12930.0,
-            "prev_settle": 12800.0,
-            "change_abs": 130.0,
-            "change_pct": 1.02,
-            "open": 12740.0,
-            "high": 13060.0,
-            "low": 12650.0,
-            "volume": 13966,
-            "open_interest": 23989,
-            "settle": 12850.0
+            "close": 12825.0,
+            "prev_settle": 12790.0,
+            "change_abs": 35.0,
+            "change_pct": 0.27,
+            "open": 12785.0,
+            "high": 12840.0,
+            "low": 12715.0,
+            "volume": 8606,
+            "open_interest": 36766,
+            "settle": 12785.0
           }
         ],
         "main": "LH2701",
-        "total_oi": 506154,
-        "total_vol": 317807,
+        "total_oi": 455611,
+        "total_vol": 267385,
         "cross_check": {
           "sources": [
             "东方财富行情接口（大商所日行情镜像）",
@@ -1725,7 +1725,7 @@
         }
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
-      "value_hash": "3cb66e1cbabe6c57",
+      "value_hash": "9aeecfc3ba709fd9",
       "hash_changed": false
     },
     "sow_inventory": {
@@ -1737,29 +1737,29 @@
       "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局 联合发布",
       "sample": "全国全面统计（非样本）",
       "freq": "季度（统计局） / 月度（农业农村部环比）",
-      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202606/",
-      "stat_date": "2026-06-30",
-      "publish_date": "2026-07-23",
+      "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202609/",
+      "stat_date": "2026-09-30",
+      "publish_date": "2026-10-29",
       "stale": false,
       "headline": {
-        "value": 3780,
-        "prev_value": 3904,
-        "prev_label": "2026年一季度末",
-        "change_abs": -124,
-        "change_pct": -3.2,
+        "value": 3602,
+        "prev_value": 3780,
+        "prev_label": "2026年二季度末",
+        "change_abs": -178,
+        "change_pct": -4.7,
         "change_unit": "万头",
         "extra_chips": [
           {
             "label": "同比",
-            "value": "-6.5%"
+            "value": "-10.7%"
           },
           {
             "label": "环比(官方)",
-            "value": "-3.2%"
+            "value": "-4.7%"
           },
           {
             "label": "占保有量",
-            "value": "100.8%"
+            "value": "96.0%"
           }
         ]
       },
@@ -1783,6 +1783,28 @@
             "kind": "official",
             "confidence": "high",
             "note": "相当于当时正常保有量的104.6%。"
+          },
+          {
+            "id": "moa-auto-2025-03-31",
+            "period_label": "2025年1季度末",
+            "stat_date": "2025-03-31",
+            "value": 4039,
+            "value_raw": "4039（相当于正常保有量的103.6%，产能正常，处于绿色区域）",
+            "yoy_pct": 1.2,
+            "yoy_abs": null,
+            "mom_pct_official": -1.0,
+            "mom_abs": null,
+            "mom_pct_computed": null,
+            "pct_of_benchmark": 103.6,
+            "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
+            "publish_date": "2025-04-25",
+            "source_title": "生猪产品数据（2025年3月）",
+            "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/",
+            "source_file": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2025/202503/202504/P020250425570366125575.xlsx",
+            "kind": "official",
+            "confidence": "high",
+            "auto": true,
+            "note": "由官方《生猪产品数据》XLSX 自动抓取并解析；发布日期取自官方文件名日期段。"
           },
           {
             "id": "derived-2025Q2",
@@ -1879,6 +1901,28 @@
             "kind": "official",
             "confidence": "high",
             "note": "官方原表数值栏原文：「3780（相当于调控目标的100.8%）」。同比减少263万头。"
+          },
+          {
+            "id": "moa-auto-2026-09-30",
+            "period_label": "2026年3季度末",
+            "stat_date": "2026-09-30",
+            "value": 3602,
+            "value_raw": "3602（相当于调控目标的96.0%）",
+            "yoy_pct": -10.7,
+            "yoy_abs": null,
+            "mom_pct_official": -4.7,
+            "mom_abs": null,
+            "mom_pct_computed": null,
+            "pct_of_benchmark": 96.0,
+            "publisher": "农业农村部、国家发展改革委、商务部、海关总署、国家统计局联合发布。",
+            "publish_date": "2026-10-29",
+            "source_title": "生猪产品数据（2026年9月）",
+            "source_url": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202609/",
+            "source_file": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/2026/202609/202610/P020261029586571843490.xlsx",
+            "kind": "official",
+            "confidence": "high",
+            "auto": true,
+            "note": "由官方《生猪产品数据》XLSX 自动抓取并解析；发布日期取自官方文件名日期段。"
           }
         ],
         "benchmark": {
@@ -1905,18 +1949,12 @@
           ]
         },
         "release_schedule": {
-          "note": "官方页面标注「每年1月20日、4月20日、7月20日、10月20日」发布月度数据；季度末绝对值随季末月一并发布。",
+          "note": "官方页面标注「每年1月20日、4月20日、7月20日、10月20日」发布月度数据；季度末绝对值随季末月一并发布。此处仅作留档，页面上的「下一期」由 pipeline 按最新入库季度自动推算。",
           "next_expected": [
             {
-              "period": "2026年三季度末",
-              "expected_date": "2026-10-19",
-              "carrier": "国家统计局《国民经济运行情况》新闻发布会（10:00）",
-              "status": "待发布"
-            },
-            {
-              "period": "2026年9月",
-              "expected_date": "2026-10-20",
-              "carrier": "五部委《生猪产品数据（2026年9月）》",
+              "period": "2026年4季度末",
+              "expected_date": "2027-01-20",
+              "carrier": "国家统计局季度发布 + 五部委《生猪产品数据（2026年12月）》",
               "status": "待发布"
             }
           ]
@@ -1963,13 +2001,15 @@
             "note": "2026年3月会前流传版本。"
           }
         ],
-        "auto_note": [],
+        "auto_note": [
+          "官方自动源新增 2 个季度观测"
+        ],
         "conflicts": [],
         "official_index": "https://www.moa.gov.cn/ztzl/szcpxx/jdsj/"
       },
       "notes": "官方数据仅在发布日更新，非发布日不得改动看板该模块。",
-      "value_hash": "fbf3d02e07a75b78",
-      "hash_changed": true
+      "value_hash": "14c0ef271b088184",
+      "hash_changed": false
     },
     "frozen_inventory": {
       "id": "frozen_inventory",

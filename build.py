@@ -291,6 +291,12 @@ def card_sow(m):
     pct = pts[-1].get("pct_of_benchmark") or 0
     bar_pct = max(0, min(100, pct / 120 * 100))
     green_lo, green_hi = 92 / 120 * 100, 103 / 120 * 100
+    if pct > 106 or pct < 88:
+        zone = "红色过度波动区间"
+    elif 92 <= pct <= 103:
+        zone = "绿色合理区间"
+    else:
+        zone = "黄色大幅波动区间"
     rows = ""
     for p in reversed(pts):
         rows += (
@@ -325,6 +331,10 @@ def card_sow(m):
         for c in m["detail"].get("corrections", [])
     )
     corr_html = f'<div class="subbox"><h4>易错说法纠正</h4><ul class="tight">{corr}</ul></div>' if corr else ""
+    an = m["detail"].get("auto_note") or []
+    auto_html = (
+        f'<p class="chart-src">自动抓取：{esc("；".join(str(x) for x in an))}</p>' if an else ""
+    )
     return f"""
 <section class="card wide">
   <header class="card-h">
@@ -346,7 +356,7 @@ def card_sow(m):
       <span>0</span><span>绿色合理区间 92%~103%</span>
       <span>正常保有量 {fmt_num(bm['value'], 0)} {esc(bm['unit'])}</span><span>120%</span>
     </div>
-    <p class="inline-note">当前为正常保有量的 <b>{pct:.1f}%</b>，处于<b>绿色合理区间</b>。
+    <p class="inline-note">当前为正常保有量的 <b>{pct:.1f}%</b>，处于<b>{zone}</b>。
       保有量目标由 {esc(bm['document'])}（{esc(bm['publish_date'])}）设定为 {fmt_num(bm['value'], 0)} {esc(bm['unit'])} 左右，
       较 2024 年 2 月的 3900 万头下调。</p>
   </div>
@@ -356,6 +366,7 @@ def card_sow(m):
       <tbody>{rows}</tbody>
     </table>
   </div>
+  {auto_html}
   <div class="subbox">
     <h4>下一期官方发布</h4>
     <ul class="tight">{nxt}</ul>
@@ -1084,6 +1095,8 @@ self.addEventListener('fetch', function (e) {
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
   if (url.origin !== location.origin) return;
+  // 一键更新接口不缓存、不拦截，始终直连本地服务
+  if (url.pathname.indexOf('/api/') !== -1) return;
 
   if (req.mode === 'navigate') {
     const APP_ROOT = new URL('./', self.registration.scope).href;
@@ -1192,6 +1205,162 @@ SW_REG_JS = r"""
   window.addEventListener('online', paint);
   window.addEventListener('offline', paint);
   document.addEventListener('DOMContentLoaded', paint);
+})();
+"""
+
+
+def _local_board_url():
+    """本机版地址（写进页面，供云端静态页提示「去本机点一键更新」）。"""
+    ip = None
+    try:
+        import socket
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("192.168.1.1", 1))
+            ip = s.getsockname()[0]
+        finally:
+            s.close()
+    except OSError:
+        ip = None
+    if not ip or ip.startswith("127."):
+        return ""
+    return f"http://{ip}:8787/"
+
+
+REFRESH_JS = r"""
+(function(){
+  var btn = document.getElementById('btn-refresh');
+  if (!btn) return;
+  var lb = btn.querySelector('.lb');
+  var msg = document.getElementById('refresh-msg');
+  var LOCAL_URL = "__LOCAL_URL__";
+  var timer = null, t0 = 0, polls = 0, mode = 'probe';
+
+  function txt(html){ if (msg) msg.innerHTML = html; }
+  function label(s){ if (lb) lb.textContent = s; }
+  function fmt(s){
+    s = Math.max(0, Math.round(s));
+    return s < 60 ? s + ' 秒' : Math.floor(s / 60) + ' 分 ' + (s % 60) + ' 秒';
+  }
+  function getJSON(url){
+    return fetch(url, {cache:'no-store', headers:{'Accept':'application/json'}})
+      .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
+  }
+  function idle(){
+    mode = 'ready';
+    btn.disabled = false;
+    btn.className = 'btn-refresh';
+    label('立即更新');
+  }
+  function paintAuto(st){
+    var el = document.getElementById('auto-scan');
+    if (!el) return;
+    var a = st && st.auto_update;
+    if (!a) { el.textContent = ''; return; }
+    var t = (st.last_check || '').replace('T', ' ').slice(5, 16);
+    if (a.skipped) { el.textContent = '公开源扫描：本轮跳过'; return; }
+    if (a.ok === false) { el.textContent = '公开源扫描：异常'; return; }
+    el.textContent = '公开源扫描 ' + t + '：巡检 ' + (a.scanned || 0) + ' 篇 · 新增冻品 '
+      + (a.frozen_added || 0) + ' / 比价 ' + (a.cull_added || 0);
+  }
+  function staticMode(){
+    mode = 'static';
+    btn.disabled = false;
+    btn.className = 'btn-refresh ghost';
+    label('立即更新');
+    txt('本页是云端静态版，每天 07:45 自动采集一次。');
+  }
+  function showStatic(){
+    txt('云端版每天 07:45 自动更新。<br>要立刻刷新，请打开 Mac 上的本机版'
+      + (LOCAL_URL ? ' <a href="' + LOCAL_URL + '">' + LOCAL_URL + '</a>' : '（在 Mac 上运行 python3 serve.py）')
+      + '，那里的按钮可以真正触发采集。');
+  }
+  function poll(){
+    clearTimeout(timer);
+    polls++;
+    if (polls > 240) { idle(); txt('更新耗时过长，已停止等待；稍后刷新页面查看结果。'); return; }
+    getJSON('api/status?_=' + Date.now()).then(function(st){
+      paintAuto(st);
+      if (st.running) {
+        var el = st.elapsed_s != null ? st.elapsed_s : (Date.now() - t0) / 1000;
+        btn.className = 'btn-refresh running';
+        btn.disabled = true;
+        label('更新中 ' + fmt(el));
+        txt('正在抓取数据源，完成后自动刷新页面。');
+        timer = setTimeout(poll, 1500);
+        return;
+      }
+      idle();
+      if (st.finished_at && t0 && Date.parse(st.finished_at) >= t0 - 2000) {
+        if (st.data_changed) {
+          txt('✓ 已更新，正在刷新页面…');
+          setTimeout(function(){ location.reload(); }, 700);
+        } else {
+          txt('✓ 已检查：没有新数据，看板未改写。最后一次 <b>' + (st.last_check || '—') + '</b>');
+        }
+      } else if (st.busy) {
+        waitBusy();
+      } else {
+        txt('最后一次巡检 <b>' + (st.last_check || '—') + '</b>');
+      }
+    }).catch(function(){
+      timer = setTimeout(poll, 2500);
+    });
+  }
+  function startPoll(){
+    mode = 'busy';
+    polls = 0;
+    t0 = Date.now();
+    btn.disabled = true;
+    btn.className = 'btn-refresh running';
+    label('更新中…');
+    timer = setTimeout(poll, 1200);
+  }
+  function waitBusy(){
+    btn.disabled = true;
+    btn.className = 'btn-refresh running';
+    label('自动巡检中…');
+    var n = 0;
+    (function step(){
+      n++;
+      if (n > 200) { idle(); txt('仍在跑；稍后刷新页面看结果。'); return; }
+      getJSON('api/status?_=' + Date.now()).then(function(st){
+        if (st.busy) { timer = setTimeout(step, 3000); return; }
+        idle();
+        txt('自动巡检已结束，可以再点「立即更新」。');
+      }).catch(function(){ timer = setTimeout(step, 3000); });
+    })();
+  }
+  function start(){
+    if (mode === 'static') { showStatic(); return; }
+    btn.disabled = true;
+    label('启动中…');
+    fetch('api/refresh', {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {'X-PigBoard-Refresh': '1', 'Content-Type': 'application/json'}
+    }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(j){ return {s: r.status, j: j || {}}; });
+    }).then(function(res){
+      if (res.j.ok) { t0 = Date.now(); startPoll(); return; }
+      idle();
+      txt('⚠ ' + (res.j.message || ('触发失败 HTTP ' + res.s)));
+      if (res.j.reason === 'busy' || res.j.reason === 'running') waitBusy();
+    }).catch(function(){
+      idle();
+      txt('⚠ 连不上更新服务（可能服务没开或网络断了）。');
+    });
+  }
+  btn.addEventListener('click', start);
+
+  getJSON('api/status?_=' + Date.now()).then(function(st){
+    paintAuto(st);
+    if (st.running) { startPoll(); return; }
+    idle();
+    if (st.busy) { waitBusy(); return; }
+    txt('最后一次巡检 <b>' + (st.last_check || '—') + '</b> · 点按钮立即重跑一次');
+  }).catch(function(){ staticMode(); });
 })();
 """
 
@@ -1414,7 +1583,8 @@ footer p{margin:6px 0}
   .meta{text-align:left}
   .wrap{padding:16px 12px 48px}
   .card{padding:16px 14px 14px;border-radius:12px}
-  .card-h h3{font-size:15.5px}
+  .card-h h3{font-size:15.5px;white-space:nowrap}
+  .card-h{flex-wrap:wrap;gap:8px}
   .asof{font-size:11.5px}
   .top{padding-bottom:14px}
   h1{font-size:22px}
@@ -1435,6 +1605,27 @@ footer p{margin:6px 0}
 /* 触摸设备去掉 hover 依赖 */
 @media(hover:none){
   details.src summary{padding:6px 0}
+}
+/* ---- 一键更新 ---- */
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:12px}
+.btn-refresh{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border:1px solid #15181d;background:#15181d;color:#fff;font:inherit;font-size:13px;font-weight:650;
+  padding:8px 16px;border-radius:9px;cursor:pointer;min-height:36px;
+  transition:background .15s,opacity .15s}
+.btn-refresh:hover{background:#000}
+.btn-refresh:active{transform:scale(.985)}
+.btn-refresh[disabled]{opacity:.62;cursor:default;transform:none}
+.btn-refresh.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn-refresh .dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:none}
+.btn-refresh.running .dot{display:inline-block;background:#f59e0b;animation:pigdot 1s infinite alternate}
+@keyframes pigdot{from{opacity:.2}to{opacity:1}}
+.refresh-msg{font-size:12px;color:var(--dim);line-height:1.5;margin:0;min-width:0}
+.refresh-msg b{color:var(--ink2)}
+.refresh-msg a{color:#1d4ed8}
+.auto-scan{font-size:12px;color:var(--dim);margin-top:2px}
+@media(max-width:820px){
+  .btn-refresh{min-height:40px;padding:9px 18px;font-size:13.5px}
+  .refresh-msg{font-size:11.5px}
 }
 """
 
@@ -1576,6 +1767,8 @@ def build_dashboard(snapshot):
         ensure_ascii=False,
     )
 
+    refresh_js = REFRESH_JS.replace("__LOCAL_URL__", _local_board_url())
+
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1602,11 +1795,18 @@ def build_dashboard(snapshot):
     <div>
       <h1>生猪市场看板</h1>
       <p class="sub">价格 · 期货 · 产能 · 冻品库存 · 淘汰强度　|　同一口径留痕，仅在数据变化时改写</p>
+      <div class="actions">
+        <button id="btn-refresh" class="btn-refresh" type="button" disabled>
+          <span class="dot" aria-hidden="true"></span><span class="lb">检查更新服务…</span>
+        </button>
+        <span id="refresh-msg" class="refresh-msg" aria-live="polite"></span>
+      </div>
     </div>
     <div class="meta">
       <div>数据快照生成：<b>{esc(snapshot['generated_at'])}</b></div>
       <div>自动巡检时刻：<span id="next-check">07:45 / 09:30 / 12:30 / 15:30 / 17:30 / 21:30</span></div>
       <div>最后巡检：<span id="last-check">读取中…</span></div>
+      <div id="auto-scan" class="auto-scan"></div>
       <div>模块：官方 {n_official} · 第三方样本 {n_third} · 市场行情 {n_market}</div>
       <div class="offline-tag" hidden>⚠ 离线 · 正在显示最后一次同步的内容</div>
     </div>
@@ -1638,6 +1838,7 @@ def build_dashboard(snapshot):
 </div>
 <script id="board-data" type="application/json">{payload}</script>
 <script>{SW_REG_JS}</script>
+<script>{refresh_js}</script>
 <script>{SPOT_JS}</script>
 <script>{MULTI_CHART_JS}</script>
 <script>

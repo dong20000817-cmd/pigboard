@@ -6,7 +6,7 @@
 
    ⚠ 全部使用**相对路径**：本站点可能部署在子路径下（如 GitHub Pages 的 /pigboard/），
      若写成 '/xxx' 会解析到域名根，导致预缓存全部 404。 */
-const VERSION = 'v-20261018-74ac37';
+const VERSION = 'v-20261029-712043';
 const CORE = [
   './',
   './manifest.webmanifest',
@@ -44,6 +44,8 @@ self.addEventListener('fetch', function (e) {
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
   if (url.origin !== location.origin) return;
+  // 一键更新接口不缓存、不拦截，始终直连本地服务
+  if (url.pathname.indexOf('/api/') !== -1) return;
 
   if (req.mode === 'navigate') {
     const APP_ROOT = new URL('./', self.registration.scope).href;
