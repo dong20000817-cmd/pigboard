@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-29T18:49:18+08:00",
+  "generated_at": "2026-10-29T20:09:30+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
