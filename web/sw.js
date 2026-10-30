@@ -6,7 +6,7 @@
 
    ⚠ 全部使用**相对路径**：本站点可能部署在子路径下（如 GitHub Pages 的 /pigboard/），
      若写成 '/xxx' 会解析到域名根，导致预缓存全部 404。 */
-const VERSION = 'v-20261030-503740';
+const VERSION = 'v-20261030-cf26e6';
 const CORE = [
   './',
   './manifest.webmanifest',
