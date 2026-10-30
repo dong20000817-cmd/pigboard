@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-30T08:21:23+08:00",
+  "generated_at": "2026-10-30T09:27:42+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -1600,15 +1600,15 @@
       "sample": "6 个活跃合约",
       "freq": "每交易日 15:00 收盘后",
       "source_url": "https://futsseapi.eastmoney.com/list/114",
-      "stat_date": "2026-10-29",
-      "publish_date": "2026-10-29",
+      "stat_date": "2026-10-30",
+      "publish_date": "2026-10-30",
       "stale": false,
       "headline": {
-        "value": 9550.0,
-        "prev_value": 9885.0,
+        "value": 9425.0,
+        "prev_value": 9630.0,
         "prev_label": "主力 LH2701 昨结算",
-        "change_abs": -335.0,
-        "change_pct": -3.39,
+        "change_abs": -205.0,
+        "change_pct": -2.13,
         "change_unit": "元/吨",
         "extra_chips": [
           {
@@ -1617,11 +1617,11 @@
           },
           {
             "label": "涨跌家数",
-            "value": "1涨5跌"
+            "value": "0涨6跌"
           },
           {
             "label": "总持仓",
-            "value": "455,611"
+            "value": "460,249"
           }
         ]
       },
@@ -1630,91 +1630,91 @@
           {
             "code": "LH2611",
             "name": "生猪2611",
-            "close": 9005.0,
-            "prev_settle": 9285.0,
-            "change_abs": -280.0,
-            "change_pct": -3.02,
-            "open": 9145.0,
-            "high": 9145.0,
-            "low": 9005.0,
-            "volume": 8831,
-            "open_interest": 9471,
-            "settle": 9065.0
+            "close": 8915.0,
+            "prev_settle": 9065.0,
+            "change_abs": -150.0,
+            "change_pct": -1.65,
+            "open": 9000.0,
+            "high": 9000.0,
+            "low": 8905.0,
+            "volume": 2560,
+            "open_interest": 8008,
+            "settle": 0.0
           },
           {
             "code": "LH2701",
             "name": "生猪2701",
-            "close": 9550.0,
-            "prev_settle": 9885.0,
-            "change_abs": -335.0,
-            "change_pct": -3.39,
-            "open": 9710.0,
-            "high": 9750.0,
-            "low": 9530.0,
-            "volume": 152402,
-            "open_interest": 161994,
-            "settle": 9630.0
+            "close": 9425.0,
+            "prev_settle": 9630.0,
+            "change_abs": -205.0,
+            "change_pct": -2.13,
+            "open": 9550.0,
+            "high": 9600.0,
+            "low": 9405.0,
+            "volume": 45356,
+            "open_interest": 166721,
+            "settle": 0.0
           },
           {
             "code": "LH2703",
             "name": "生猪2703",
-            "close": 9350.0,
-            "prev_settle": 9670.0,
-            "change_abs": -320.0,
-            "change_pct": -3.31,
-            "open": 9600.0,
-            "high": 9600.0,
-            "low": 9335.0,
-            "volume": 63278,
-            "open_interest": 145242,
-            "settle": 9405.0
+            "close": 9265.0,
+            "prev_settle": 9405.0,
+            "change_abs": -140.0,
+            "change_pct": -1.49,
+            "open": 9345.0,
+            "high": 9385.0,
+            "low": 9235.0,
+            "volume": 23078,
+            "open_interest": 145946,
+            "settle": 0.0
           },
           {
             "code": "LH2705",
             "name": "生猪2705",
-            "close": 10420.0,
-            "prev_settle": 10655.0,
-            "change_abs": -235.0,
-            "change_pct": -2.21,
-            "open": 10570.0,
-            "high": 10570.0,
-            "low": 10360.0,
-            "volume": 23275,
-            "open_interest": 60424,
-            "settle": 10430.0
+            "close": 10280.0,
+            "prev_settle": 10430.0,
+            "change_abs": -150.0,
+            "change_pct": -1.44,
+            "open": 10425.0,
+            "high": 10425.0,
+            "low": 10245.0,
+            "volume": 8288,
+            "open_interest": 61039,
+            "settle": 0.0
           },
           {
             "code": "LH2707",
             "name": "生猪2707",
-            "close": 11640.0,
-            "prev_settle": 11700.0,
-            "change_abs": -60.0,
-            "change_pct": -0.51,
-            "open": 11670.0,
-            "high": 11670.0,
-            "low": 11555.0,
-            "volume": 10993,
-            "open_interest": 41714,
-            "settle": 11610.0
+            "close": 11495.0,
+            "prev_settle": 11610.0,
+            "change_abs": -115.0,
+            "change_pct": -0.99,
+            "open": 11600.0,
+            "high": 11635.0,
+            "low": 11470.0,
+            "volume": 4159,
+            "open_interest": 41919,
+            "settle": 0.0
           },
           {
             "code": "LH2709",
             "name": "生猪2709",
-            "close": 12825.0,
-            "prev_settle": 12790.0,
-            "change_abs": 35.0,
-            "change_pct": 0.27,
-            "open": 12785.0,
-            "high": 12840.0,
-            "low": 12715.0,
-            "volume": 8606,
-            "open_interest": 36766,
-            "settle": 12785.0
+            "close": 12735.0,
+            "prev_settle": 12785.0,
+            "change_abs": -50.0,
+            "change_pct": -0.39,
+            "open": 12820.0,
+            "high": 12825.0,
+            "low": 12720.0,
+            "volume": 3100,
+            "open_interest": 36616,
+            "settle": 0.0
           }
         ],
         "main": "LH2701",
-        "total_oi": 455611,
-        "total_vol": 267385,
+        "total_oi": 460249,
+        "total_vol": 86541,
         "cross_check": {
           "sources": [
             "东方财富行情接口（大商所日行情镜像）",
@@ -1725,8 +1725,8 @@
         }
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
-      "value_hash": "9aeecfc3ba709fd9",
-      "hash_changed": false
+      "value_hash": "bfef427784a285b5",
+      "hash_changed": true
     },
     "sow_inventory": {
       "id": "sow_inventory",
