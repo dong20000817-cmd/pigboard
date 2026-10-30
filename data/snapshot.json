@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-10-30T07:53:12+08:00",
+  "generated_at": "2026-10-30T08:21:23+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -1588,7 +1588,7 @@
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
       "value_hash": "156a103db6908fa8",
-      "hash_changed": true
+      "hash_changed": false
     },
     "dce_futures": {
       "id": "dce_futures",
@@ -1726,7 +1726,7 @@
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
       "value_hash": "9aeecfc3ba709fd9",
-      "hash_changed": true
+      "hash_changed": false
     },
     "sow_inventory": {
       "id": "sow_inventory",
