@@ -143,7 +143,7 @@ def append_history(filename, key_fields, row, value_fields):
                 fieldnames.append("revised_from")
             if "revised_at" not in fieldnames:
                 fieldnames.append("revised_at")
-            _rewrite(path, fieldnames, rows)
+            _rewrite(path, fieldnames, _sort_rows(rows, key_fields))
             return "revised"
 
     row = dict(row)
@@ -154,8 +154,14 @@ def append_history(filename, key_fields, row, value_fields):
         if fn not in fieldnames:
             fieldnames.append(fn)
     rows.append(row)
-    _rewrite(path, fieldnames, rows)
+    _rewrite(path, fieldnames, _sort_rows(rows, key_fields))
     return "inserted"
+
+
+def _sort_rows(rows, key_fields):
+    """按主键排序后落盘：本地与云端各自追加时行序不同，排序后 diff 才稳定，
+    否则每次跨机器合并都会整文件冲突。"""
+    return sorted(rows, key=lambda e: tuple(str(e.get(k, "")) for k in key_fields))
 
 
 def _rewrite(path, fieldnames, rows):
@@ -232,7 +238,7 @@ def bulk_upsert_history(filename, key_fields, rows, value_fields):
         changed = True
 
     if changed:
-        existing.sort(key=lambda e: tuple(str(e.get(k, "")) for k in key_fields))
+        existing = _sort_rows(existing, key_fields)
         _rewrite(path, fieldnames, existing)
 
     stats["status"] = (

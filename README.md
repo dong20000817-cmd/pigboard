@@ -136,6 +136,7 @@ python3 serve.py                # 仅本机
 python3 serve.py --lan          # 开放给同一 Wi-Fi
 
 # 自检：验证「没有新数据就不动看板」这条承诺
+# （建议在期货收盘后跑：盘中报价每几分钟跳一次，会被算作'有新数据'）
 python3 selftest.py
 
 # 定时任务
