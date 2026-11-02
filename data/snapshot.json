@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-11-01T10:35:45+08:00",
+  "generated_at": "2026-11-02T10:44:47+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -20,60 +20,56 @@
       "sample": "全国口径综合报价",
       "freq": "日度（含周末与节假日，无报价日顺延）",
       "source_url": "https://xt.yangzhu.vip/manage/datamap/ptype/1/areano/-1.html",
-      "stat_date": "2026-11-01",
-      "publish_date": "2026-11-01",
+      "stat_date": "2026-11-02",
+      "publish_date": "2026-11-02",
       "stale": false,
       "headline": {
-        "value": 9.19,
+        "value": 9.22,
         "prev_value": 9.19,
         "prev_label": "前一报价日",
-        "change_abs": 0.0,
-        "change_pct": 0.0,
+        "change_abs": 0.03,
+        "change_pct": 0.33,
         "change_unit": "元/公斤",
         "extra_chips": [
           {
             "label": "同比",
-            "value": "-26.48%"
+            "value": "-26.00%"
           },
           {
             "label": "环比",
-            "value": "-9.46%"
+            "value": "-10.75%"
           },
           {
             "label": "元/斤",
-            "value": "4.59"
+            "value": "4.61"
           }
         ]
       },
       "detail": {
         "extras": {
           "内三元": {
-            "value": 9.78,
-            "change": -0.03
+            "value": 9.83,
+            "change": 0.05
           },
           "土杂猪": {
             "value": 9.18,
-            "change": -0.03
+            "change": 0.0
           },
           "玉米": {
-            "value": 2343.0,
-            "change": 15.0,
+            "value": 2324.0,
+            "change": -19.0,
             "unit": "元/吨"
           },
           "豆粕": {
-            "value": 3096.0,
-            "change": 7.0,
+            "value": 3104.0,
+            "change": 8.0,
             "unit": "元/吨"
           },
           "猪粮比": {
-            "value": "3.92"
+            "value": "3.97"
           }
         },
         "series": [
-          [
-            "2025-10-31",
-            12.52
-          ],
           [
             "2025-11-01",
             12.5
@@ -1537,48 +1533,52 @@
           [
             "2026-11-01",
             9.19
+          ],
+          [
+            "2026-11-02",
+            9.22
           ]
         ],
         "series_range": [
-          "2025-10-31",
-          "2026-11-01"
+          "2025-11-01",
+          "2026-11-02"
         ],
         "windows": {
           "7": {
             "window": 7,
             "available": true,
-            "start_date": "2026-10-25",
-            "start_value": 9.48,
-            "end_date": "2026-11-01",
-            "end_value": 9.19,
-            "change_abs": -0.29,
-            "change_pct": -3.06,
-            "high": 9.47,
+            "start_date": "2026-10-26",
+            "start_value": 9.47,
+            "end_date": "2026-11-02",
+            "end_value": 9.22,
+            "change_abs": -0.25,
+            "change_pct": -2.64,
+            "high": 9.43,
             "low": 9.19,
             "points": 7
           },
           "30": {
             "window": 30,
             "available": true,
-            "start_date": "2026-10-02",
-            "start_value": 10.33,
-            "end_date": "2026-11-01",
-            "end_value": 9.19,
-            "change_abs": -1.14,
-            "change_pct": -11.04,
-            "high": 10.34,
+            "start_date": "2026-10-03",
+            "start_value": 10.34,
+            "end_date": "2026-11-02",
+            "end_value": 9.22,
+            "change_abs": -1.12,
+            "change_pct": -10.83,
+            "high": 10.33,
             "low": 9.19,
             "points": 30
           },
           "90": {
             "window": 90,
             "available": true,
-            "start_date": "2026-08-03",
-            "start_value": 10.52,
-            "end_date": "2026-11-01",
-            "end_value": 9.19,
-            "change_abs": -1.33,
-            "change_pct": -12.64,
+            "start_date": "2026-08-04",
+            "start_value": 10.48,
+            "end_date": "2026-11-02",
+            "end_value": 9.22,
+            "change_abs": -1.26,
+            "change_pct": -12.02,
             "high": 11.28,
             "low": 9.19,
             "points": 90
@@ -1587,7 +1587,7 @@
         "history_error": null
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
-      "value_hash": "2e6e2e00aec8ca03",
+      "value_hash": "9ff1ee27fc621e32",
       "hash_changed": true
     },
     "dce_futures": {
@@ -1600,15 +1600,15 @@
       "sample": "6 个活跃合约",
       "freq": "每交易日 15:00 收盘后",
       "source_url": "https://futsseapi.eastmoney.com/list/114",
-      "stat_date": "2026-10-30",
-      "publish_date": "2026-10-30",
+      "stat_date": "2026-11-02",
+      "publish_date": "2026-11-02",
       "stale": false,
       "headline": {
-        "value": 9510.0,
-        "prev_value": 9630.0,
+        "value": 9595.0,
+        "prev_value": 9530.0,
         "prev_label": "主力 LH2701 昨结算",
-        "change_abs": -120.0,
-        "change_pct": -1.25,
+        "change_abs": 65.0,
+        "change_pct": 0.68,
         "change_unit": "元/吨",
         "extra_chips": [
           {
@@ -1617,11 +1617,11 @@
           },
           {
             "label": "涨跌家数",
-            "value": "3涨3跌"
+            "value": "5涨1跌"
           },
           {
             "label": "总持仓",
-            "value": "450,003"
+            "value": "444,699"
           }
         ]
       },
@@ -1630,103 +1630,109 @@
           {
             "code": "LH2611",
             "name": "生猪2611",
-            "close": 8530.0,
-            "prev_settle": 9065.0,
-            "change_abs": -535.0,
-            "change_pct": -5.9,
-            "open": 9000.0,
-            "high": 9140.0,
-            "low": 8525.0,
-            "volume": 15373,
-            "open_interest": 324,
-            "settle": 8970.0
+            "close": 8500.0,
+            "prev_settle": 8970.0,
+            "change_abs": -470.0,
+            "change_pct": -5.24,
+            "open": 8535.0,
+            "high": 8645.0,
+            "low": 8435.0,
+            "volume": 251,
+            "open_interest": 118,
+            "settle": 0.0
           },
           {
             "code": "LH2701",
             "name": "生猪2701",
-            "close": 9510.0,
-            "prev_settle": 9630.0,
-            "change_abs": -120.0,
-            "change_pct": -1.25,
-            "open": 9550.0,
-            "high": 9680.0,
-            "low": 9400.0,
-            "volume": 182517,
-            "open_interest": 161040,
-            "settle": 9530.0
+            "close": 9595.0,
+            "prev_settle": 9530.0,
+            "change_abs": 65.0,
+            "change_pct": 0.68,
+            "open": 9490.0,
+            "high": 9650.0,
+            "low": 9430.0,
+            "volume": 78727,
+            "open_interest": 160872,
+            "settle": 0.0
           },
           {
             "code": "LH2703",
             "name": "生猪2703",
-            "close": 9340.0,
-            "prev_settle": 9405.0,
-            "change_abs": -65.0,
-            "change_pct": -0.69,
-            "open": 9345.0,
-            "high": 9475.0,
-            "low": 9230.0,
-            "volume": 81092,
-            "open_interest": 147465,
-            "settle": 9335.0
+            "close": 9440.0,
+            "prev_settle": 9335.0,
+            "change_abs": 105.0,
+            "change_pct": 1.12,
+            "open": 9310.0,
+            "high": 9490.0,
+            "low": 9265.0,
+            "volume": 36152,
+            "open_interest": 144095,
+            "settle": 0.0
           },
           {
             "code": "LH2705",
             "name": "生猪2705",
-            "close": 10440.0,
-            "prev_settle": 10430.0,
-            "change_abs": 10.0,
-            "change_pct": 0.1,
-            "open": 10425.0,
-            "high": 10595.0,
-            "low": 10230.0,
-            "volume": 29116,
-            "open_interest": 60377,
-            "settle": 10395.0
+            "close": 10525.0,
+            "prev_settle": 10395.0,
+            "change_abs": 130.0,
+            "change_pct": 1.25,
+            "open": 10440.0,
+            "high": 10590.0,
+            "low": 10375.0,
+            "volume": 14542,
+            "open_interest": 58875,
+            "settle": 0.0
           },
           {
             "code": "LH2707",
             "name": "生猪2707",
-            "close": 11660.0,
-            "prev_settle": 11610.0,
-            "change_abs": 50.0,
-            "change_pct": 0.43,
-            "open": 11600.0,
-            "high": 11860.0,
-            "low": 11470.0,
-            "volume": 18182,
-            "open_interest": 43270,
-            "settle": 11640.0
+            "close": 11715.0,
+            "prev_settle": 11640.0,
+            "change_abs": 75.0,
+            "change_pct": 0.64,
+            "open": 11685.0,
+            "high": 11825.0,
+            "low": 11595.0,
+            "volume": 8769,
+            "open_interest": 42977,
+            "settle": 0.0
           },
           {
             "code": "LH2709",
             "name": "生猪2709",
-            "close": 12855.0,
-            "prev_settle": 12785.0,
-            "change_abs": 70.0,
-            "change_pct": 0.55,
-            "open": 12820.0,
-            "high": 13000.0,
-            "low": 12715.0,
-            "volume": 11476,
-            "open_interest": 37527,
-            "settle": 12825.0
+            "close": 12830.0,
+            "prev_settle": 12825.0,
+            "change_abs": 5.0,
+            "change_pct": 0.04,
+            "open": 12850.0,
+            "high": 12920.0,
+            "low": 12760.0,
+            "volume": 6721,
+            "open_interest": 37762,
+            "settle": 0.0
           }
         ],
         "main": "LH2701",
-        "total_oi": 450003,
-        "total_vol": 337756,
+        "total_oi": 444699,
+        "total_vol": 145162,
         "cross_check": {
           "sources": [
             "东方财富行情接口（大商所日行情镜像）",
             "新浪财经行情接口"
           ],
-          "matched": 6,
-          "conflicts": []
+          "matched": 5,
+          "conflicts": [
+            {
+              "code": "LH2701",
+              "em_close": 9590.0,
+              "sina_close": 9595.0
+            }
+          ]
         }
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
-      "value_hash": "dbf4d9cff434fe59",
-      "hash_changed": false
+      "value_hash": "e5c97839d4f80379",
+      "hash_changed": true
     },
     "sow_inventory": {
       "id": "sow_inventory",
