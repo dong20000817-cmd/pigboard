@@ -6,7 +6,7 @@
 
    ⚠ 全部使用**相对路径**：本站点可能部署在子路径下（如 GitHub Pages 的 /pigboard/），
      若写成 '/xxx' 会解析到域名根，导致预缓存全部 404。 */
-const VERSION = 'v-20261110-e43014-f2c3a7';
+const VERSION = 'v-20261110-e43014-9b05f9';
 const CORE = [
   './',
   './manifest.webmanifest',
@@ -92,7 +92,9 @@ self.addEventListener('fetch', function (e) {
       };
 
       const network = fetch(req, { cache: 'no-store' }).then(function (r) {
-        if (r && r.ok) { cacheNav(r); notify(); }
+        if (r && r.ok) {
+          return cacheNav(r).then(function () { notify(); return r; });
+        }
         return r;
       }).catch(function () { return null; });
 
@@ -103,6 +105,9 @@ self.addEventListener('fetch', function (e) {
       const first = await Promise.race([network, timeout]);
       clearTimeout(timer);
       if (first) return first;
+
+      // 超时先给缓存时，用 waitUntil 保住后台网络请求，确保它能写完缓存
+      try { e.waitUntil(network.then(function () {}).catch(function () {})); } catch (_) {}
 
       const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
       if (hit) return hit;   // 后台的 network 仍会完成、写缓存并通知页面刷新
