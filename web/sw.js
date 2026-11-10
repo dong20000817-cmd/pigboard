@@ -6,7 +6,7 @@
 
    ⚠ 全部使用**相对路径**：本站点可能部署在子路径下（如 GitHub Pages 的 /pigboard/），
      若写成 '/xxx' 会解析到域名根，导致预缓存全部 404。 */
-const VERSION = 'v-20261110-89f543';
+const VERSION = 'v-20261110-e43014-f2c3a7';
 const CORE = [
   './',
   './manifest.webmanifest',
@@ -32,9 +32,16 @@ self.addEventListener('install', function (e) {
 self.addEventListener('activate', function (e) {
   e.waitUntil((async function () {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(function (k) { return k !== VERSION; })
-                          .map(function (k) { return caches.delete(k); }));
+    const oldKeys = keys.filter(function (k) { return k !== VERSION; });
+    await Promise.all(oldKeys.map(function (k) { return caches.delete(k); }));
     await self.clients.claim();
+    // 从旧版本升级时强制刷新已打开的页面，避免“新 SW 已装好、页面还是旧缓存”
+    if (oldKeys.length) {
+      const cs = await self.clients.matchAll({ type: 'window' });
+      for (const c of cs) {
+        try { c.navigate(c.url); } catch (_) {}
+      }
+    }
   })());
 });
 
@@ -47,9 +54,25 @@ self.addEventListener('fetch', function (e) {
   // 一键更新接口不缓存、不拦截，始终直连本地服务
   if (url.pathname.indexOf('/api/') !== -1) return;
 
+  // 心跳必须走网络：否则页面会拿旧缓存判断“已是最新”，永远发现不了新版本。
+  // 网络不可用时才回落到最后一次缓存。
+  if (/\/data\/heartbeat\.json$/.test(url.pathname)) {
+    e.respondWith((async function () {
+      try {
+        return await fetch(req, { cache: 'no-store' });
+      } catch (_) {
+        const hit = await caches.match(req, { ignoreSearch: true });
+        return hit || new Response('', { status: 504 });
+      }
+    })());
+    return;
+  }
+
   if (req.mode === 'navigate') {
     const APP_ROOT = new URL('./', self.registration.scope).href;
-    const NET_TIMEOUT = 3000;  // 网络慢时先用缓存秒开，后台再更新
+    // 8 秒只是“先给缓存”的阈值；网络请求不会取消，完成后仍会写入缓存并通知页面。
+    // 原来的 3 秒阈值 + 后台静默刷新在 iOS 上经常来不及完成，导致页面永远停在旧缓存。
+    const NET_TIMEOUT = 8000;
 
     e.respondWith((async function () {
       const cacheNav = async function (r) {
@@ -60,37 +83,37 @@ self.addEventListener('fetch', function (e) {
           try { await c.put(APP_ROOT, r.clone()); } catch (_) {}
         } catch (_) {}
       };
+      const notify = function () {
+        self.clients.matchAll({ type: 'window' }).then(function (cs) {
+          cs.forEach(function (c) {
+            try { c.postMessage({ type: 'pb-updated' }); } catch (_) {}
+          });
+        }).catch(function () {});
+      };
+
+      const network = fetch(req, { cache: 'no-store' }).then(function (r) {
+        if (r && r.ok) { cacheNav(r); notify(); }
+        return r;
+      }).catch(function () { return null; });
 
       let timer;
-      try {
-        const net = await Promise.race([
-          fetch(req),
-          new Promise(function (_, rej) {
-            timer = setTimeout(function () { rej(new Error('net-timeout')); }, NET_TIMEOUT);
-          })
-        ]);
-        clearTimeout(timer);
-        if (net && net.ok) cacheNav(net);
-        return net;
-      } catch (_) {
-        clearTimeout(timer);
-        const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
-        if (hit) {
-          // 命中缓存：立即返回，同时后台静默更新
-          fetch(req).then(cacheNav).catch(function () {});
-          return hit;
-        }
-        try {
-          const net = await fetch(req);
-          if (net && net.ok) cacheNav(net);
-          return net;
-        } catch (__) { /* 落到离线页 */ }
-        return new Response(
-          '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
-          '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
-          '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
-          { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
-      }
+      const timeout = new Promise(function (resolve) {
+        timer = setTimeout(function () { resolve(null); }, NET_TIMEOUT);
+      });
+      const first = await Promise.race([network, timeout]);
+      clearTimeout(timer);
+      if (first) return first;
+
+      const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
+      if (hit) return hit;   // 后台的 network 仍会完成、写缓存并通知页面刷新
+
+      const late = await network;
+      if (late) return late;
+      return new Response(
+        '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
+        '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
+        '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
+        { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     })());
     return;
   }
@@ -120,4 +143,15 @@ self.addEventListener('fetch', function (e) {
       return new Response('', { status: 504 });
     }
   })());
+});
+
+// 页面可以主动要求新 SW 立即接管 / 清空缓存（用于“获取最新版”与陈旧页面自愈）
+self.addEventListener('message', function (e) {
+  const d = e.data || {};
+  if (d.type === 'SKIP_WAITING') self.skipWaiting();
+  if (d.type === 'CLEAR_CACHES') {
+    e.waitUntil(caches.keys().then(function (ks) {
+      return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+    }));
+  }
 });

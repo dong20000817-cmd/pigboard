@@ -5,6 +5,7 @@
 """
 
 import csv
+import hashlib
 import json
 import os
 
@@ -1083,9 +1084,16 @@ self.addEventListener('install', function (e) {
 self.addEventListener('activate', function (e) {
   e.waitUntil((async function () {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(function (k) { return k !== VERSION; })
-                          .map(function (k) { return caches.delete(k); }));
+    const oldKeys = keys.filter(function (k) { return k !== VERSION; });
+    await Promise.all(oldKeys.map(function (k) { return caches.delete(k); }));
     await self.clients.claim();
+    // 从旧版本升级时强制刷新已打开的页面，避免“新 SW 已装好、页面还是旧缓存”
+    if (oldKeys.length) {
+      const cs = await self.clients.matchAll({ type: 'window' });
+      for (const c of cs) {
+        try { c.navigate(c.url); } catch (_) {}
+      }
+    }
   })());
 });
 
@@ -1098,9 +1106,25 @@ self.addEventListener('fetch', function (e) {
   // 一键更新接口不缓存、不拦截，始终直连本地服务
   if (url.pathname.indexOf('/api/') !== -1) return;
 
+  // 心跳必须走网络：否则页面会拿旧缓存判断“已是最新”，永远发现不了新版本。
+  // 网络不可用时才回落到最后一次缓存。
+  if (/\/data\/heartbeat\.json$/.test(url.pathname)) {
+    e.respondWith((async function () {
+      try {
+        return await fetch(req, { cache: 'no-store' });
+      } catch (_) {
+        const hit = await caches.match(req, { ignoreSearch: true });
+        return hit || new Response('', { status: 504 });
+      }
+    })());
+    return;
+  }
+
   if (req.mode === 'navigate') {
     const APP_ROOT = new URL('./', self.registration.scope).href;
-    const NET_TIMEOUT = 3000;  // 网络慢时先用缓存秒开，后台再更新
+    // 8 秒只是“先给缓存”的阈值；网络请求不会取消，完成后仍会写入缓存并通知页面。
+    // 原来的 3 秒阈值 + 后台静默刷新在 iOS 上经常来不及完成，导致页面永远停在旧缓存。
+    const NET_TIMEOUT = 8000;
 
     e.respondWith((async function () {
       const cacheNav = async function (r) {
@@ -1111,37 +1135,37 @@ self.addEventListener('fetch', function (e) {
           try { await c.put(APP_ROOT, r.clone()); } catch (_) {}
         } catch (_) {}
       };
+      const notify = function () {
+        self.clients.matchAll({ type: 'window' }).then(function (cs) {
+          cs.forEach(function (c) {
+            try { c.postMessage({ type: 'pb-updated' }); } catch (_) {}
+          });
+        }).catch(function () {});
+      };
+
+      const network = fetch(req, { cache: 'no-store' }).then(function (r) {
+        if (r && r.ok) { cacheNav(r); notify(); }
+        return r;
+      }).catch(function () { return null; });
 
       let timer;
-      try {
-        const net = await Promise.race([
-          fetch(req),
-          new Promise(function (_, rej) {
-            timer = setTimeout(function () { rej(new Error('net-timeout')); }, NET_TIMEOUT);
-          })
-        ]);
-        clearTimeout(timer);
-        if (net && net.ok) cacheNav(net);
-        return net;
-      } catch (_) {
-        clearTimeout(timer);
-        const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
-        if (hit) {
-          // 命中缓存：立即返回，同时后台静默更新
-          fetch(req).then(cacheNav).catch(function () {});
-          return hit;
-        }
-        try {
-          const net = await fetch(req);
-          if (net && net.ok) cacheNav(net);
-          return net;
-        } catch (__) { /* 落到离线页 */ }
-        return new Response(
-          '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
-          '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
-          '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
-          { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
-      }
+      const timeout = new Promise(function (resolve) {
+        timer = setTimeout(function () { resolve(null); }, NET_TIMEOUT);
+      });
+      const first = await Promise.race([network, timeout]);
+      clearTimeout(timer);
+      if (first) return first;
+
+      const hit = (await caches.match(req)) || (await caches.match(APP_ROOT));
+      if (hit) return hit;   // 后台的 network 仍会完成、写缓存并通知页面刷新
+
+      const late = await network;
+      if (late) return late;
+      return new Response(
+        '<!DOCTYPE html><meta charset="utf-8"><title>离线</title>' +
+        '<body style="font:16px/1.7 -apple-system,sans-serif;padding:40px;color:#333">' +
+        '<h2>暂时无法连接</h2><p>尚未缓存任何看板内容。请先在有网络时打开一次。</p></body>',
+        { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
     })());
     return;
   }
@@ -1171,6 +1195,17 @@ self.addEventListener('fetch', function (e) {
       return new Response('', { status: 504 });
     }
   })());
+});
+
+// 页面可以主动要求新 SW 立即接管 / 清空缓存（用于“获取最新版”与陈旧页面自愈）
+self.addEventListener('message', function (e) {
+  const d = e.data || {};
+  if (d.type === 'SKIP_WAITING') self.skipWaiting();
+  if (d.type === 'CLEAR_CACHES') {
+    e.waitUntil(caches.keys().then(function (ks) {
+      return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+    }));
+  }
 });
 """
 
@@ -1209,23 +1244,18 @@ SW_REG_JS = r"""
 """
 
 
-def _local_board_url():
-    """本机版地址（写进页面，供云端静态页提示「去本机点一键更新」）。"""
-    ip = None
-    try:
-        import socket
+CLOUD_BOARD_URL = "https://dong20000817-cmd.github.io/pigboard/"
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            s.connect(("192.168.1.1", 1))
-            ip = s.getsockname()[0]
-        finally:
-            s.close()
-    except OSError:
-        ip = None
-    if not ip or ip.startswith("127."):
-        return ""
-    return f"http://{ip}:8787/"
+
+def _local_board_url():
+    """本机版地址。只接受显式配置，绝不把构建机的内网 IP 写进页面。
+
+    以前这里用 socket 探测本机 IP：在本机构建时得到 192.168.x.x 还算可用，
+    但在 GitHub Actions 上会得到 runner 的 10.x 内网地址（如 10.1.0.199），
+    云端页面的「立即更新」就会把手机指向一个根本不存在的地址。
+    局域网 / Tailscale / localhost 页面现在由前端用 location.origin 自动补全。
+    """
+    return os.environ.get("PIGBOARD_LOCAL_URL", "").strip()
 
 
 REFRESH_JS = r"""
@@ -1234,8 +1264,20 @@ REFRESH_JS = r"""
   if (!btn) return;
   var lb = btn.querySelector('.lb');
   var msg = document.getElementById('refresh-msg');
+  var CLOUD_URL = "__CLOUD_URL__";
   var LOCAL_URL = "__LOCAL_URL__";
   var timer = null, t0 = 0, polls = 0, mode = 'probe';
+
+  function isPrivateHost(h){
+    return h === 'localhost' || h === '127.0.0.1' || h === '[::1]' ||
+      /^10\./.test(h) || /^192\.168\./.test(h) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
+      /\.ts\.net$/.test(h) || /\.local$/.test(h);
+  }
+  // 本机 / 局域网 / Tailscale 页面：地址就是当前 origin，不再依赖构建时写死的 IP
+  if (!LOCAL_URL && isPrivateHost(location.hostname)) {
+    LOCAL_URL = location.origin + '/';
+  }
 
   function txt(html){ if (msg) msg.innerHTML = html; }
   function label(s){ if (lb) lb.textContent = s; }
@@ -1247,6 +1289,32 @@ REFRESH_JS = r"""
     return fetch(url, {cache:'no-store', headers:{'Accept':'application/json'}})
       .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
   }
+  // 彻底绕过 Service Worker / HTTP 缓存：清缓存、注销 SW，再带时间戳重载。
+  function hardReload(){
+    var go = function(){ location.replace(location.pathname + '?fresh=' + Date.now()); };
+    var jobs = [];
+    try {
+      if (window.caches && caches.keys) {
+        jobs.push(caches.keys().then(function(ks){
+          return Promise.all(ks.map(function(k){ return caches.delete(k); }));
+        }));
+      }
+    } catch (_) {}
+    try {
+      if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+        jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+          return Promise.all(rs.map(function(r){ return r.unregister(); }));
+        }));
+      }
+    } catch (_) {}
+    if (!jobs.length) { go(); return; }
+    var done = false;
+    var finish = function(){ if (!done) { done = true; go(); } };
+    Promise.all(jobs).then(finish, finish);
+    setTimeout(finish, 2500);
+  }
+  window.__pbHardReload = hardReload;
+
   function idle(){
     mode = 'ready';
     btn.disabled = false;
@@ -1268,13 +1336,16 @@ REFRESH_JS = r"""
     mode = 'static';
     btn.disabled = false;
     btn.className = 'btn-refresh ghost';
-    label('立即更新');
-    txt('本页是云端静态版，每天 07:45 自动采集一次。');
+    label('获取最新版');
+    txt('本页是云端静态版，数据每天 07:45 自动更新。点按钮可强制获取最新发布。');
   }
-  function showStatic(){
-    txt('云端版每天 07:45 自动更新。<br>要立刻刷新，请打开 Mac 上的本机版'
-      + (LOCAL_URL ? ' <a href="' + LOCAL_URL + '">' + LOCAL_URL + '</a>' : '（在 Mac 上运行 python3 serve.py）')
-      + '，那里的按钮可以真正触发采集。');
+  function localDownMode(){
+    mode = 'localdown';
+    btn.disabled = false;
+    btn.className = 'btn-refresh ghost';
+    label('重试更新');
+    txt('连不上本机更新服务（Mac 可能休眠，或这个地址已失效）。'
+      + (CLOUD_URL ? '<br>改用云端最新版：<a href="' + CLOUD_URL + '">' + CLOUD_URL + '</a>' : ''));
   }
   function poll(){
     clearTimeout(timer);
@@ -1332,8 +1403,7 @@ REFRESH_JS = r"""
       }).catch(function(){ timer = setTimeout(step, 3000); });
     })();
   }
-  function start(){
-    if (mode === 'static') { showStatic(); return; }
+  function trigger(){
     btn.disabled = true;
     label('启动中…');
     fetch('api/refresh', {
@@ -1348,9 +1418,19 @@ REFRESH_JS = r"""
       txt('⚠ ' + (res.j.message || ('触发失败 HTTP ' + res.s)));
       if (res.j.reason === 'busy' || res.j.reason === 'running') waitBusy();
     }).catch(function(){
-      idle();
-      txt('⚠ 连不上更新服务（可能服务没开或网络断了）。');
+      localDownMode();
     });
+  }
+  function start(){
+    if (mode === 'static') {
+      btn.disabled = true;
+      btn.className = 'btn-refresh running';
+      label('获取最新版…');
+      txt('正在清除旧缓存并获取最新发布…');
+      hardReload();
+      return;
+    }
+    trigger();
   }
   btn.addEventListener('click', start);
 
@@ -1360,7 +1440,76 @@ REFRESH_JS = r"""
     idle();
     if (st.busy) { waitBusy(); return; }
     txt('最后一次巡检 <b>' + (st.last_check || '—') + '</b> · 点按钮立即重跑一次');
-  }).catch(function(){ staticMode(); });
+  }).catch(function(){
+    if (isPrivateHost(location.hostname)) { localDownMode(); }
+    else { staticMode(); }
+  });
+})();
+"""
+
+
+HEARTBEAT_JS = r"""
+(function(){
+  var el = document.getElementById('last-check');
+  var nx = document.getElementById('next-check');
+  var banner = document.getElementById('cache-banner');
+  var pageGen = '';
+  try {
+    var board = document.getElementById('board-data');
+    pageGen = (JSON.parse(board.textContent) || {}).generated_at || '';
+  } catch (e) {}
+
+  function showBanner(html){
+    if (!banner) return;
+    banner.innerHTML = html;
+    banner.hidden = false;
+  }
+  function hideBanner(){ if (banner) banner.hidden = true; }
+  function pretty(ts){ return (ts || '').replace('T', ' ').slice(0, 16); }
+  function hardReload(){
+    if (window.__pbHardReload) { window.__pbHardReload(); return; }
+    location.replace(location.pathname + '?fresh=' + Date.now());
+  }
+  function offline(msg){
+    if (el) el.textContent = '离线查看（未连接更新服务）';
+    if (nx) nx.textContent = '—';
+    showBanner('⚠ ' + msg + ' 当前显示的是缓存页面（快照 ' + pretty(pageGen) + '）。'
+      + ' <a href="#" id="cache-retry">重试</a>');
+    var retry = document.getElementById('cache-retry');
+    if (retry) retry.onclick = function(e){ e.preventDefault(); hardReload(); };
+  }
+
+  fetch('data/heartbeat.json?_=' + Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(h){
+      if(!h || !h.last_check){
+        offline('未能连接更新服务。');
+        return;
+      }
+      if (el) el.textContent = h.last_check + (h.data_changed ? '（本次有数据更新）' : '（本次无变化，未改写看板）');
+      if(nx && h.schedule) { nx.textContent = h.schedule; }
+
+      var fresh = h.last_data_change || h.last_check;
+      var stale = pageGen && fresh && (Date.parse(fresh) - Date.parse(pageGen) > 60000);
+      if (!stale) {
+        hideBanner();
+        try { sessionStorage.removeItem('pb-stale-reload'); } catch (e) {}
+        return;
+      }
+      var msg = '发现更新（数据至 ' + pretty(fresh) + '），当前页面快照是 ' + pretty(pageGen) + '。';
+      var once = false;
+      try { once = !!sessionStorage.getItem('pb-stale-reload'); } catch (e) {}
+      if (!once) {
+        try { sessionStorage.setItem('pb-stale-reload', '1'); } catch (e) {}
+        showBanner('⏳ ' + msg + ' 正在自动获取最新版本…');
+        setTimeout(hardReload, 900);
+      } else {
+        showBanner('⚠ ' + msg + ' <a href="#" id="cache-refresh">立即刷新</a>');
+        var a = document.getElementById('cache-refresh');
+        if (a) a.onclick = function(e){ e.preventDefault(); hardReload(); };
+      }
+    })
+    .catch(function(){ offline('未能连接更新服务。'); });
 })();
 """
 
@@ -1641,9 +1790,14 @@ ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 
 
 def _make_service_worker(snapshot):
-    """生成带版本号的 Service Worker，使 iPhone 可离线查看最后同步内容。"""
-    ver = "v-" + str(snapshot.get("generated_at", ""))[:10].replace("-", "") + "-" + \
-          store.value_hash(snapshot.get("modules", {}))[:6]
+    """生成带版本号的 Service Worker，使 iPhone 可离线查看最后同步内容。
+
+    版本号同时包含「数据指纹」和「SW 模板指纹」：即使某天没有新数据，
+    只要缓存策略代码改了，手机也能检测到新 SW 并更新。
+    """
+    code_ver = hashlib.sha1(SW_TEMPLATE.encode("utf-8")).hexdigest()[:6]
+    ver = ("v-" + str(snapshot.get("generated_at", ""))[:10].replace("-", "") + "-"
+           + store.value_hash(snapshot.get("modules", {}))[:6] + "-" + code_ver)
     out = os.path.join(store.ROOT, "web", "sw.js")
     with open(out, "w", encoding="utf-8") as f:
         f.write(("// 由 build.py 自动生成，请勿手改\n" + SW_TEMPLATE).replace("__VERSION__", ver))
@@ -1767,7 +1921,9 @@ def build_dashboard(snapshot):
         ensure_ascii=False,
     )
 
-    refresh_js = REFRESH_JS.replace("__LOCAL_URL__", _local_board_url())
+    refresh_js = (REFRESH_JS
+                  .replace("__LOCAL_URL__", _local_board_url())
+                  .replace("__CLOUD_URL__", CLOUD_BOARD_URL))
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1813,6 +1969,7 @@ def build_dashboard(snapshot):
   </div>
 
   {stale_banner}
+  <div id="cache-banner" class="stale-banner" hidden></div>
 
   <div class="grid">
     {''.join(cards)}
@@ -1848,20 +2005,7 @@ def build_dashboard(snapshot):
   window.__initMultiChart({{dataId:'ratioData',svgId:'ratioChart',tipId:'ratioTip',legendId:'ratioLegend',defaultSpan:180}});
 }})();
 </script>
-<script>
-(function(){{
-  var el = document.getElementById('last-check');
-  var nx = document.getElementById('next-check');
-  fetch('data/heartbeat.json?_=' + Date.now(), {{cache:'no-store'}})
-    .then(function(r){{ return r.ok ? r.json() : null; }})
-    .then(function(h){{
-      if(!h) {{ el.textContent = '离线查看（未连接本地服务）'; nx.textContent = '—'; return; }}
-      el.textContent = h.last_check + (h.data_changed ? '（本次有数据更新）' : '（本次无变化，未改写看板）');
-      if(nx && h.schedule) {{ nx.textContent = h.schedule; }}
-    }})
-    .catch(function(){{ el.textContent = '离线查看（未连接本地服务）'; nx.textContent = '—'; }});
-}})();
-</script>
+<script>{HEARTBEAT_JS}</script>
 </body>
 </html>
 """
