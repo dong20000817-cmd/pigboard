@@ -677,9 +677,11 @@ footer p{margin:6px 0}
     return fetch(url, {cache:'no-store', headers:{'Accept':'application/json'}})
       .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
   }
-  // 彻底绕过 Service Worker / HTTP 缓存：清缓存、注销 SW，再带时间戳重载。
-  function hardReload(){
+  // force=true：清缓存、注销 SW，再带时间戳重载（用于“发现新版本”）。
+  // force=false：普通重载，保留离线缓存（用于断网时的“重试”）。
+  function hardReload(force){
     var go = function(){ location.replace(location.pathname + '?fresh=' + Date.now()); };
+    if (!force) { location.reload(); return; }
     var jobs = [];
     try {
       if (window.caches && caches.keys) {
@@ -815,7 +817,7 @@ footer p{margin:6px 0}
       btn.className = 'btn-refresh running';
       label('获取最新版…');
       txt('正在清除旧缓存并获取最新发布…');
-      hardReload();
+      hardReload(true);
       return;
     }
     trigger();
@@ -1207,9 +1209,9 @@ footer p{margin:6px 0}
   }
   function hideBanner(){ if (banner) banner.hidden = true; }
   function pretty(ts){ return (ts || '').replace('T', ' ').slice(0, 16); }
-  function hardReload(){
-    if (window.__pbHardReload) { window.__pbHardReload(); return; }
-    location.replace(location.pathname + '?fresh=' + Date.now());
+  function hardReload(force){
+    if (window.__pbHardReload) { window.__pbHardReload(force); return; }
+    location.reload();
   }
   function offline(msg){
     if (el) el.textContent = '离线查看（未连接更新服务）';
@@ -1217,7 +1219,7 @@ footer p{margin:6px 0}
     showBanner('⚠ ' + msg + ' 当前显示的是缓存页面（快照 ' + pretty(pageGen) + '）。'
       + ' <a href="#" id="cache-retry">重试</a>');
     var retry = document.getElementById('cache-retry');
-    if (retry) retry.onclick = function(e){ e.preventDefault(); hardReload(); };
+    if (retry) retry.onclick = function(e){ e.preventDefault(); hardReload(false); };
   }
 
   fetch('data/heartbeat.json?_=' + Date.now(), {cache:'no-store'})
@@ -1243,11 +1245,11 @@ footer p{margin:6px 0}
       if (!once) {
         try { sessionStorage.setItem('pb-stale-reload', '1'); } catch (e) {}
         showBanner('⏳ ' + msg + ' 正在自动获取最新版本…');
-        setTimeout(hardReload, 900);
+        setTimeout(function(){ hardReload(true); }, 900);
       } else {
         showBanner('⚠ ' + msg + ' <a href="#" id="cache-refresh">立即刷新</a>');
         var a = document.getElementById('cache-refresh');
-        if (a) a.onclick = function(e){ e.preventDefault(); hardReload(); };
+        if (a) a.onclick = function(e){ e.preventDefault(); hardReload(true); };
       }
     })
     .catch(function(){ offline('未能连接更新服务。'); });
