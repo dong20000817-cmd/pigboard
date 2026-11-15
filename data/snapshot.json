@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-11-14T11:34:29+08:00",
+  "generated_at": "2026-11-15T11:06:36+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -20,28 +20,28 @@
       "sample": "全国口径综合报价",
       "freq": "日度（含周末与节假日，无报价日顺延）",
       "source_url": "https://xt.yangzhu.vip/manage/datamap/ptype/1/areano/-1.html",
-      "stat_date": "2026-11-14",
-      "publish_date": "2026-11-14",
+      "stat_date": "2026-11-15",
+      "publish_date": "2026-11-15",
       "stale": false,
       "headline": {
-        "value": 8.75,
-        "prev_value": 8.67,
+        "value": 9.01,
+        "prev_value": 8.75,
         "prev_label": "前一报价日",
-        "change_abs": 0.08,
-        "change_pct": 0.92,
+        "change_abs": 0.26,
+        "change_pct": 2.97,
         "change_unit": "元/公斤",
         "extra_chips": [
           {
             "label": "同比",
-            "value": "-25.47%"
+            "value": "-23.32%"
           },
           {
             "label": "环比",
-            "value": "-12.32%"
+            "value": "-9.26%"
           },
           {
             "label": "元/斤",
-            "value": "4.38"
+            "value": "4.50"
           }
         ]
       },
@@ -49,31 +49,27 @@
         "extras": {
           "内三元": {
             "value": 9.34,
-            "change": 0.07
+            "change": 0.0
           },
           "土杂猪": {
-            "value": 8.82,
-            "change": 0.05
+            "value": 8.84,
+            "change": 0.02
           },
           "玉米": {
-            "value": 2324.0,
-            "change": 1.0,
+            "value": 2312.0,
+            "change": -12.0,
             "unit": "元/吨"
           },
           "豆粕": {
-            "value": 3070.0,
-            "change": 3.0,
+            "value": 3068.0,
+            "change": -2.0,
             "unit": "元/吨"
           },
           "猪粮比": {
-            "value": "3.77"
+            "value": "3.90"
           }
         },
         "series": [
-          [
-            "2025-11-13",
-            11.83
-          ],
           [
             "2025-11-14",
             11.74
@@ -1537,35 +1533,39 @@
           [
             "2026-11-14",
             8.75
+          ],
+          [
+            "2026-11-15",
+            9.01
           ]
         ],
         "series_range": [
-          "2025-11-13",
-          "2026-11-14"
+          "2025-11-14",
+          "2026-11-15"
         ],
         "windows": {
           "7": {
             "window": 7,
             "available": true,
-            "start_date": "2026-11-07",
+            "start_date": "2026-11-08",
             "start_value": 8.69,
-            "end_date": "2026-11-14",
-            "end_value": 8.75,
-            "change_abs": 0.06,
-            "change_pct": 0.69,
-            "high": 8.75,
+            "end_date": "2026-11-15",
+            "end_value": 9.01,
+            "change_abs": 0.32,
+            "change_pct": 3.68,
+            "high": 9.01,
             "low": 8.63,
             "points": 7
           },
           "30": {
             "window": 30,
             "available": true,
-            "start_date": "2026-10-15",
-            "start_value": 9.93,
-            "end_date": "2026-11-14",
-            "end_value": 8.75,
-            "change_abs": -1.18,
-            "change_pct": -11.88,
+            "start_date": "2026-10-16",
+            "start_value": 9.88,
+            "end_date": "2026-11-15",
+            "end_value": 9.01,
+            "change_abs": -0.87,
+            "change_pct": -8.81,
             "high": 9.94,
             "low": 8.63,
             "points": 30
@@ -1573,12 +1573,12 @@
           "90": {
             "window": 90,
             "available": true,
-            "start_date": "2026-08-16",
-            "start_value": 10.87,
-            "end_date": "2026-11-14",
-            "end_value": 8.75,
-            "change_abs": -2.12,
-            "change_pct": -19.5,
+            "start_date": "2026-08-17",
+            "start_value": 10.94,
+            "end_date": "2026-11-15",
+            "end_value": 9.01,
+            "change_abs": -1.93,
+            "change_pct": -17.64,
             "high": 11.28,
             "low": 8.63,
             "points": 90
@@ -1587,7 +1587,7 @@
         "history_error": null
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
-      "value_hash": "a8a9fb7494a137c3",
+      "value_hash": "65d186ddd0d8396f",
       "hash_changed": true
     },
     "dce_futures": {
@@ -1726,7 +1726,7 @@
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
       "value_hash": "720c4219c5e233b2",
-      "hash_changed": true
+      "hash_changed": false
     },
     "sow_inventory": {
       "id": "sow_inventory",
