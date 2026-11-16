@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "project": "生猪市场看板",
-  "generated_at": "2026-11-15T11:06:36+08:00",
+  "generated_at": "2026-11-16T11:09:49+08:00",
   "module_order": [
     "hog_spot",
     "dce_futures",
@@ -22,7 +22,7 @@
       "source_url": "https://xt.yangzhu.vip/manage/datamap/ptype/1/areano/-1.html",
       "stat_date": "2026-11-15",
       "publish_date": "2026-11-15",
-      "stale": false,
+      "stale": true,
       "headline": {
         "value": 9.01,
         "prev_value": 8.75,
@@ -1587,8 +1587,10 @@
         "history_error": null
       },
       "notes": "单位为元/公斤；页面同时提供同比、环比。1元/斤=2元/公斤。",
-      "value_hash": "65d186ddd0d8396f",
-      "hash_changed": true
+      "value_hash": "a207e2355832bae0",
+      "hash_changed": true,
+      "checked_at": "2026-11-16T11:09:16+08:00",
+      "error_detail": "RuntimeError: 请求失败 https://xt.yangzhu.vip/data/getzhujiatoday: <urlopen error timed out>"
     },
     "dce_futures": {
       "id": "dce_futures",
@@ -1602,7 +1604,7 @@
       "source_url": "https://futsseapi.eastmoney.com/list/114",
       "stat_date": "2026-11-13",
       "publish_date": "2026-11-13",
-      "stale": false,
+      "stale": true,
       "headline": {
         "value": 9645.0,
         "prev_value": 9465.0,
@@ -1725,8 +1727,10 @@
         }
       },
       "notes": "收盘价与结算价是两个概念：交易所日内盈亏按结算价计算，看板同时给出两者。",
-      "value_hash": "720c4219c5e233b2",
-      "hash_changed": false
+      "value_hash": "e1b95aae2a58d545",
+      "hash_changed": true,
+      "checked_at": "2026-11-16T11:09:17+08:00",
+      "error_detail": "ValueError: could not convert string to float: '-'"
     },
     "sow_inventory": {
       "id": "sow_inventory",
@@ -2480,5 +2484,8 @@
       "hash_changed": false
     }
   },
-  "source_errors": {}
+  "source_errors": {
+    "hog_spot": "RuntimeError: 请求失败 https://xt.yangzhu.vip/data/getzhujiatoday: <urlopen error timed out>",
+    "dce_futures": "ValueError: could not convert string to float: '-'"
+  }
 }
